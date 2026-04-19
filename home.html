@@ -3,20 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Krishna Ads - Home</title>
+    <title>Krishna Ads - Full Screen Dashboard</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
-        /* Ad Overlay Styling */
+        /* Ad Overlay - Full Screen Setup */
         #ad-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; z-index: 2000; flex-direction: column; align-items: center; justify-content: center;
+            background: #000; z-index: 2000; flex-direction: column;
         }
-        .timer-display { font-size: 30px; color: #00ff00; margin-bottom: 15px; font-weight: bold; }
-        
-        /* Video Container with Unskippable Blocker */
-        .video-container { position: relative; width: 95%; max-width: 600px; aspect-ratio: 16/9; }
-        .video-blocker { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2001; background: rgba(0,0,0,0); }
-        iframe, img { width: 100%; height: 100%; border-radius: 10px; border: 2px solid #fff; object-fit: cover; }
+
+        .timer-display { 
+            position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
+            font-size: 35px; color: #00ff00; font-weight: bold; z-index: 2005;
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.8);
+            background: rgba(0,0,0,0.5); padding: 5px 20px; border-radius: 30px;
+        }
+
+        .video-container { width: 100%; height: 100%; position: relative; }
+
+        /* Full Size Media */
+        iframe, img { 
+            width: 100% !important; height: 100% !important; 
+            border: none; object-fit: cover; /* Cover se full screen fill hoga */
+        }
+
+        .video-blocker { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2002; background: rgba(0,0,0,0); }
+
+        /* Loading Spinner */
+        #loading-msg {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            color: white; font-size: 20px; z-index: 2001;
+        }
 
         /* Dashboard UI */
         .container { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; padding: 40px 20px; }
@@ -24,15 +41,11 @@
             background: #fff; padding: 25px; width: 260px; border-radius: 15px; text-align: center; 
             cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-top: 5px solid #28a745;
         }
-        .ad-box:hover { transform: translateY(-5px); }
-
-        /* Floating Profile Button */
         .profile-btn {
             position: fixed; bottom: 25px; right: 25px; background: #28a745;
             color: white; width: 60px; height: 60px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            text-decoration: none; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            z-index: 100;
+            text-decoration: none; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 100;
         }
     </style>
 </head>
@@ -45,15 +58,13 @@
 
     <div class="container">
         <div class="ad-box" onclick="startTask('reel')">
-            <h3>Watch Reels</h3>
+            <h3>Watch Full Reels</h3>
             <p>Earn ₹0.10 | 30s</p>
         </div>
-
         <div class="ad-box" onclick="startTask('post')">
-            <h3>View Posts</h3>
+            <h3>View Full Posts</h3>
             <p>Earn ₹0.06 | 10s</p>
         </div>
-
         <div class="ad-box" onclick="startTask('movie')">
             <h3>Short Movie Ad</h3>
             <p>Earn ₹0.50 | 2m</p>
@@ -61,35 +72,52 @@
     </div>
 
     <div id="ad-overlay">
-        <div class="timer-display">Wait: <span id="countdown">0</span>s</div>
+        <div id="loading-msg">Loading Media... Please wait</div>
+        <div id="timer-box" class="timer-display" style="display:none;">Wait: <span id="countdown">0</span>s</div>
+        
         <div class="video-container">
             <div id="blocker-layer" class="video-blocker"></div>
-            <div id="media-content"></div>
+            <div id="media-content" style="width:100%; height:100%;"></div>
         </div>
-        <p style="color: #ccc; margin-top: 20px;">Watching Ad... Reward will be added automatically.</p>
     </div>
 
     <a href="profile.html" class="profile-btn">Profile</a>
 
     <script>
-        // Post images (Kyunki ye 1000+ ho sakti hain, aap yahan bas image names ki list rakhein)
-        // Image path: upload-add/post/image1.png
-        const postDatabase = ["1b0536ece6d7c04180ec9bfbc772d2e1.jpg", "221147ea2778af9c1e6c82761e47d01c.jpg", "580fba1deafcf017acd880984461296a.jpg", "787756e0bf5c8282e44ef4471a2874dc.jpg","IMG-20260307-WA0003.jpg", "InShot_20260311_082602526.jpg", "InShot_20260413_213048735.jpg"]; 
+        // --- DATA ---
+        const postDatabase = [
+            "1b0536ece6d7c04180ec9bfbc772d2e1.jpg", 
+            "221147ea2778af9c1e6c82761e47d01c.jpg", 
+            "580fba1deafcf017acd880984461296a.jpg", 
+            "787756e0bf5c8282e44ef4471a2874dc.jpg",
+            "IMG-20260307-WA0003.jpg", 
+            "InShot_20260311_082602526.jpg", 
+            "InShot_20260413_213048735.jpg"
+        ];
+
+        let countdownInterval;
 
         async function startTask(type) {
             let selectedId = "";
             let duration = 0;
 
             try {
+                document.getElementById('ad-overlay').style.display = 'flex';
+                document.getElementById('loading-msg').style.display = 'block';
+                document.getElementById('timer-box').style.display = 'none';
+                document.getElementById('media-content').innerHTML = "";
+
                 if (type === 'post') {
-                    // Post Logic
                     let seen = JSON.parse(localStorage.getItem('seen_post')) || [];
                     let available = postDatabase.filter(img => !seen.includes(img));
-                    if(available.length === 0) return alert("All posts watched!");
+                    if(available.length === 0) {
+                        closeOverlay();
+                        return alert("Sari posts dekh li hain!");
+                    }
                     selectedId = available[Math.floor(Math.random() * available.length)];
                     duration = 10;
+                    loadMedia(type, selectedId, duration);
                 } else {
-                    // Reels & Movie Logic from External .txt files
                     const fileName = (type === 'reel') ? 'reels.txt' : 'movie.txt';
                     const response = await fetch(fileName);
                     const text = await response.text();
@@ -98,62 +126,71 @@
                     let seen = JSON.parse(localStorage.getItem(`seen_${type}`)) || [];
                     let available = allIds.filter(id => !seen.includes(id));
 
-                    if(available.length === 0) return alert(`No more ${type}s available!`);
+                    if(available.length === 0) {
+                        closeOverlay();
+                        return alert(`Saari ${type}s dekh li hain!`);
+                    }
                     
                     selectedId = available[Math.floor(Math.random() * available.length)];
                     duration = (type === 'reel') ? 30 : 120;
+                    loadMedia(type, selectedId, duration);
                 }
-
-                showAd(type, selectedId, duration);
-
             } catch (err) {
-                console.error(err);
-                alert("Error: File (.txt) nahi mili! GitHub par check karein.");
+                alert("Error loading files. Check GitHub.");
+                closeOverlay();
             }
         }
 
-        function showAd(type, id, dur) {
-            const overlay = document.getElementById('ad-overlay');
+        function loadMedia(type, id, dur) {
             const content = document.getElementById('media-content');
-            const timerDisplay = document.getElementById('countdown');
-
-            overlay.style.display = 'flex';
-            timerDisplay.innerText = dur;
+            let mediaHtml = "";
 
             if (type === 'post') {
-                content.innerHTML = `<img src="upload-add/post/${id}" onerror="alert('Image not found!')">`;
+                mediaHtml = `<img src="upload-add/post/${id}" onload="startTimer(${dur}, '${type}', '${id}')" onerror="alert('Image error')">`;
             } else {
-                // YouTube Embed
-                content.innerHTML = `<iframe src="https://www.youtube.com/embed/${id}?autoplay=1&controls=0&disablekb=1&modestbranding=1" frameborder="0" allow="autoplay"></iframe>`;
+                // YouTube with Event Listener (Muted autoplay for full loading)
+                mediaHtml = `<iframe id="yt-player" src="https://www.youtube.com/embed/${id}?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0" 
+                             onload="startTimer(${dur}, '${type}', '${id}')" frameborder="0" allow="autoplay"></iframe>`;
             }
+            content.innerHTML = mediaHtml;
+        }
 
-            let timeLeft = dur;
-            const clock = setInterval(() => {
+        function startTimer(seconds, type, id) {
+            // Hide loading, show timer
+            document.getElementById('loading-msg').style.display = 'none';
+            document.getElementById('timer-box').style.display = 'block';
+            
+            let timeLeft = seconds;
+            document.getElementById('countdown').innerText = timeLeft;
+
+            clearInterval(countdownInterval);
+            countdownInterval = setInterval(() => {
                 timeLeft--;
-                timerDisplay.innerText = timeLeft;
-                if(timeLeft <= 0) {
-                    clearInterval(clock);
-                    addReward(type, id);
+                document.getElementById('countdown').innerText = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(countdownInterval);
+                    finishTask(type, id);
                 }
             }, 1000);
         }
 
-        function addReward(type, id) {
-            // Save as seen
+        function finishTask(type, id) {
             let seen = JSON.parse(localStorage.getItem(`seen_${type}`)) || [];
             seen.push(id);
             localStorage.setItem(`seen_${type}`, JSON.stringify(seen));
 
-            // Add Money to Cookie (1 Year)
             let reward = (type === 'reel') ? 0.10 : (type === 'post' ? 0.06 : 0.50);
             let currentBal = parseFloat(getCookie("balance")) || 0;
             setCookie("balance", (currentBal + reward).toFixed(2));
 
-            alert(`₹${reward} added to your wallet!`);
+            alert(`Task Complete! ₹${reward} added.`);
             window.location.href = "earning.html";
         }
 
-        // Cookie Helpers
+        function closeOverlay() {
+            document.getElementById('ad-overlay').style.display = 'none';
+        }
+
         function setCookie(n, v) {
             const d = new Date(); d.setTime(d.getTime() + (365*24*60*60*1000));
             document.cookie = `${n}=${v};expires=${d.toUTCString()};path=/`;
@@ -164,4 +201,4 @@
         }
     </script>
 </body>
-        </html>
+    </html>
