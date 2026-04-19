@@ -2,82 +2,160 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Withdrawal - Krishna Ads</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Wallet - Krishna Ads</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { background: #f0f2f5; font-family: 'Segoe UI', sans-serif; margin: 0; padding-bottom: 80px; }
-        header { background: #fff; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .container { max-width: 500px; margin: 20px auto; padding: 0 15px; }
-        .balance-card { background: linear-gradient(135deg, #28a745, #1e7e34); color: white; padding: 30px; border-radius: 20px; text-align: center; box-shadow: 0 8px 20px rgba(40,167,69,0.3); margin-bottom: 25px; }
+        body { background: #f4f7f6; font-family: 'Segoe UI', sans-serif; margin: 0; padding-bottom: 80px; }
+        header { background: #fff; padding: 15px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .container { max-width: 450px; margin: auto; padding: 15px; }
+
+        .balance-card {
+            background: linear-gradient(135deg, #28a745, #1e7e34); color: white;
+            padding: 30px; border-radius: 20px; text-align: center; margin-bottom: 20px;
+        }
+        .balance-amount { font-size: 40px; font-weight: bold; }
+
         .withdraw-form { background: #fff; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        input, select { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        .btn-wa { width: 100%; background: #25D366; color: white; border: none; padding: 15px; border-radius: 10px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; text-decoration: none; }
+        .input-group { margin-bottom: 15px; text-align: left; }
+        label { font-size: 13px; font-weight: bold; color: #555; }
+        input, select { 
+            width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ddd; 
+            border-radius: 8px; box-sizing: border-box; font-size: 15px;
+        }
+
+        /* QR Preview Section */
+        #qr-preview-box {
+            display: none;
+            text-align: center;
+            margin-top: 15px;
+            padding: 10px;
+            border: 2px dashed #28a745;
+            border-radius: 10px;
+        }
+        #qr-preview-box img { width: 150px; height: 150px; }
+
+        .submit-btn {
+            width: 100%; background: #25D366; color: white; border: none;
+            padding: 15px; border-radius: 10px; font-size: 16px; font-weight: bold;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
+            margin-top: 10px;
+        }
+
+        .footer-nav { 
+            position: fixed; bottom: 0; width: 100%; background: #fff; 
+            display: flex; justify-content: space-around; padding: 12px 0; 
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1); 
+        }
+        .footer-nav a { text-decoration: none; color: #888; font-size: 11px; text-align: center; }
+        .active { color: #28a745 !important; }
     </style>
 </head>
 <body>
 
-<header>
-    <span style="font-weight:bold; color:#28a745;">KRISHNA ADS</span>
-    <div id="nav-bal" style="font-weight:bold;">₹0.00</div>
-</header>
+    <header>
+        <h2 style="margin:0; color:#28a745;">My Wallet</h2>
+    </header>
 
-<div class="container">
-    <div class="balance-card">
-        <span>Available for Withdrawal</span>
-        <div style="font-size:40px; font-weight:bold;">₹<span id="display-balance">0.00</span></div>
+    <div class="container">
+        <div class="balance-card">
+            <span>Current Balance</span>
+            <div class="balance-amount">₹<span id="bal-val">0.00</span></div>
+            <p style="font-size:12px; opacity:0.8;">Minimum Withdrawal: ₹1</p>
+        </div>
+
+        <div class="withdraw-form">
+            <h3 style="margin-top:0; color:#333;">Withdraw Funds</h3>
+            
+            <div class="input-group">
+                <label>Payment Method</label>
+                <select id="pay-method">
+                    <option value="UPI">UPI (GPay/PhonePe/Paytm)</option>
+                    <option value="PayPal">PayPal (Email)</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label>UPI ID / PayPal Email</label>
+                <input type="text" id="pay-id" placeholder="e.g. user@oksbi or email@example.com">
+            </div>
+
+            <div id="qr-preview-box">
+                <p style="font-size: 11px; font-weight: bold;">Payment QR Generated!</p>
+                <img id="generated-qr" src="" alt="Withdrawal QR">
+                <p style="font-size: 10px; color: #666;">This QR will be sent to Admin</p>
+            </div>
+
+            <button class="submit-btn" onclick="processRequest()">
+                <i class="fab fa-whatsapp"></i> Send Request + QR
+            </button>
+        </div>
     </div>
 
-    <div class="withdraw-form">
-        <label>Select Method</label>
-        <select id="pay-method">
-            <option>Google Pay</option>
-            <option>PhonePe</option>
-            <option>Paytm</option>
-        </select>
-        <label>Phone Number</label>
-        <input type="number" id="pay-number" placeholder="Enter GPay/PhonePe Number">
-        
-        <button class="btn-wa" onclick="processWithdraw()">
-            <i class="fab fa-whatsapp"></i> Request via WhatsApp
-        </button>
+    <div class="footer-nav">
+        <a href="home.html"><i class="fas fa-home"></i><br>Home</a>
+        <a href="earning.html" class="active"><i class="fas fa-wallet"></i><br>Wallet</a>
+        <a href="profile.html"><i class="fas fa-user"></i><br>Profile</a>
     </div>
-</div>
 
-<script>
-    function getCookie(n) {
-        let b = document.cookie.match('(^|;)\\s*' + n + '\\s*=\\s*([^;]+)');
-        return b ? b.pop() : "0.00";
-    }
+    <script>
+        // Load Balance
+        function getCookie(n) {
+            let b = document.cookie.match('(^|;)\\s*' + n + '\\s*=\\s*([^;]+)');
+            return b ? b.pop() : "0.00";
+        }
+        const balance = getCookie("balance");
+        const user = JSON.parse(decodeURIComponent(getCookie("user_profile") || "{}"));
+        document.getElementById('bal-val').innerText = balance;
 
-    const user = JSON.parse(decodeURIComponent(getCookie("user_profile") || "{}"));
-    const balance = getCookie("balance");
-    document.getElementById('display-balance').innerText = balance;
-    document.getElementById('nav-bal').innerText = "₹" + balance;
+        function processRequest() {
+            let method = document.getElementById('pay-method').value;
+            let identifier = document.getElementById('pay-id').value.trim();
+            let amount = parseFloat(balance);
 
-    function processWithdraw() {
-        const num = document.getElementById('pay-number').value;
-        const method = document.getElementById('pay-method').value;
+            if(amount < 1) {
+                alert("Balance ₹1 se zyada hona chahiye!");
+                return;
+            }
 
-        if(num.length < 10) return alert("Sahi number dalein!");
-        if(parseFloat(balance) < 1) return alert("Minimum ₹1 balance chahiye.");
+            if(identifier === "") {
+                alert("Kripya ID ya Email bharein!");
+                return;
+            }
 
-        // 1. Save to Admin Panel Notifications
-        let requests = JSON.parse(localStorage.getItem('admin_notifications')) || [];
-        requests.push({
-            user: user.name || "Unknown",
-            mobile: num,
-            amount: balance,
-            method: method,
-            time: new Date().toLocaleString(),
-            status: "Pending"
-        });
-        localStorage.setItem('admin_notifications', JSON.stringify(requests));
+            // 1. Generate QR Data based on method
+            let qrContent = "";
+            if(method === "UPI") {
+                // Standard UPI Deep Link for GPay/PhonePe/Paytm
+                qrContent = `upi://pay?pa=${identifier}&pn=${user.name}&am=${amount}&cu=INR`;
+            } else {
+                // PayPal link
+                qrContent = `https://www.paypal.me/${identifier}/${amount}`;
+            }
 
-        // 2. Open WhatsApp
-        let msg = `*Withdrawal Request*%0AUser: ${user.name}%0AAmount: ₹${balance}%0AApp: ${method}%0ANumber: ${num}`;
-        window.location.href = `https://wa.me/917862043514?text=${msg}`;
-    }
-</script>
+            // 2. Use QRServer API (Third Party)
+            let qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(qrContent)}`;
+            
+            // Show preview
+            document.getElementById('generated-qr').src = qrImageUrl;
+            document.getElementById('qr-preview-box').style.display = "block";
+
+            // 3. Prepare WhatsApp message
+            let msg = `*NEW WITHDRAWAL REQUEST*%0A` +
+                      `----------------------------%0A` +
+                      `*User:* ${user.name || 'User'}%0A` +
+                      `*Amount:* ₹${amount}%0A` +
+                      `*Method:* ${method}%0A` +
+                      `*Pay ID:* ${identifier}%0A` +
+                      `*QR Link:* ${qrImageUrl}%0A` +
+                      `----------------------------%0A` +
+                      `Admin, upar diye gaye QR link se pay karein.`;
+
+            // Redirect to WhatsApp
+            setTimeout(() => {
+                window.location.href = `https://wa.me/917862043514?text=${msg}`;
+            }, 1000);
+        }
+    </script>
 </body>
 </html>
