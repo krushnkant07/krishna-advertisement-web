@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Withdrawal - Krishna Ads</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -12,7 +12,7 @@
         
         .earning-container { max-width: 500px; margin: 20px auto; padding: 0 15px; }
         
-        /* User Profile Info */
+        /* User Info Card */
         .user-card {
             background: #fff; padding: 20px; border-radius: 15px; margin-bottom: 20px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-left: 5px solid #28a745;
@@ -46,20 +46,22 @@
             font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s;
         }
         .withdraw-btn { background: #007bff; color: white; box-shadow: 0 4px 12px rgba(0,123,255,0.3); }
-        .whatsapp-btn { background: #25D366; color: white; margin-top: 15px; display: none; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .whatsapp-btn { background: #25D366; color: white; margin-top: 15px; text-decoration: none; display: none; align-items: center; justify-content: center; gap: 10px; }
         
         /* Sticky Bottom Nav */
         .footer-nav { position: fixed; bottom: 0; width: 100%; background: #fff; display: flex; justify-content: space-around; padding: 12px 0; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); z-index: 100; }
         .footer-nav a { text-decoration: none; color: #888; font-size: 11px; text-align: center; font-weight: 500; }
         .footer-nav a i { font-size: 20px; margin-bottom: 4px; display: block; }
         .footer-nav a.active { color: #28a745; }
+
+        .payment-id { background: #eee; padding: 10px; border-radius: 8px; margin: 10px 0; font-size: 14px; font-weight: bold; color: #333; word-break: break-all; }
     </style>
 </head>
 <body>
 
     <header>
         <span style="font-weight:bold; color:#28a745; font-size: 20px;">KRISHNA ADS</span>
-        <div style="font-size: 12px; color: #666;"><i class="fas fa-shield-alt"></i> Secure Payment</div>
+        <div style="font-size: 12px; color: #666;"><i class="fas fa-shield-alt"></i> Secure Center</div>
     </header>
 
     <div class="earning-container">
@@ -81,20 +83,21 @@
             <p style="font-size: 11px; background: rgba(0,0,0,0.15); display: inline-block; padding: 3px 12px; border-radius: 50px;">Min. Withdraw: ₹1</p>
         </div>
 
-        <button class="btn withdraw-btn" onclick="generateSecureQR()">
-            <i class="fas fa-qrcode"></i> Generate GPay QR
+        <button class="btn withdraw-btn" onclick="generateRequestQR()">
+            <i class="fas fa-qrcode"></i> Generate Withdrawal QR
         </button>
 
         <div id="qr-area" class="qr-section">
-            <h4 style="margin:0; color:#333;">Payment QR Code</h4>
-            <p style="font-size:11px; color:#666; margin-top:5px;">Scan with GPay, PhonePe or Paytm</p>
+            <h4 style="margin:0; color:#333;">Request QR Generated</h4>
             <div class="qr-box">
-                <img id="qr-img" src="" alt="UPI Payment QR" style="width:100%; height:100%;">
+                <img id="qr-img" src="" alt="Payment Request QR" style="width:100%; height:100%;">
             </div>
-            <p style="font-size:12px; color:#dc3545; font-weight:bold; margin-bottom:15px;">Take screenshot & send on WhatsApp!</p>
+            <p style="font-size:12px; font-weight:bold; color:#555;">Admin UPI ID:</p>
+            <div class="payment-id">krushndevtalpada1@oksbi</div>
+            <p style="font-size:12px; color:#dc3545; font-weight:bold; margin-bottom:15px;">Take screenshot & send to Admin!</p>
             
             <a id="wa-link" href="#" class="btn whatsapp-btn">
-                <i class="fab fa-whatsapp" style="font-size:20px;"></i> Send Request to Admin
+                <i class="fab fa-whatsapp" style="font-size:20px;"></i> Send Screenshot to Admin
             </a>
         </div>
     </div>
@@ -132,8 +135,8 @@
         let totalSecs = (r.length * 30) + (p.length * 10) + (m.length * 120);
         document.getElementById('u-time').innerText = "Watch Time: " + Math.floor(totalSecs/60) + "m " + (totalSecs%60) + "s";
 
-        // --- SECURE UPI QR LOGIC ---
-        function generateSecureQR() {
+        // --- NEW WORKING QR LOGIC ---
+        function generateRequestQR() {
             let balAmt = parseFloat(balance);
             
             if(balAmt < 1) {
@@ -141,32 +144,27 @@
                 return;
             }
 
-            // APKI UPI ID INTEGRATED
+            // Humne yahan 'Text Data' QR banaya hai jo har app scan kar sakegi
             let adminUPI = "krushndevtalpada1@oksbi"; 
-            let adminName = "Krushn Kant";
-            let txNote = encodeURIComponent(`Withdrawal - ${userProfile.name}`);
-
-            // Standard UPI Deep Link (Works in all Indian Payment Apps)
-            let upiLink = `upi://pay?pa=${adminUPI}&pn=${encodeURIComponent(adminName)}&am=${balAmt}&cu=INR&tn=${txNote}`;
+            let qrData = `PAYMENT REQUEST\nName: ${userProfile.name}\nMobile: ${userProfile.mobile}\nAmount: Rs.${balAmt}\nUPI ID: ${adminUPI}`;
             
-            // Using a more reliable QR API
-            let qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(upiLink)}`;
+            let qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(qrData)}`;
             
             document.getElementById('qr-img').src = qrUrl;
             document.getElementById('qr-area').style.display = 'block';
             document.getElementById('wa-link').style.display = 'flex';
 
-            // WhatsApp Request Message
+            // WhatsApp Message
             let waMsg = `*Withdrawal Request*%0A%0A` +
-                        `*User:* ${userProfile.name}%0A` +
-                        `*Number:* ${userProfile.mobile}%0A` +
-                        `*Amount:* ₹${balAmt}%0A` +
-                        `*Watch Time:* ${Math.floor(totalSecs/60)}m%0A%0A` +
-                        `Maine QR scan kar liya hai, kripya check karke payment karein.`;
+                        `*User Name:* ${userProfile.name}%0A` +
+                        `*User Mobile:* ${userProfile.mobile}%0A` +
+                        `*Balance:* ₹${balAmt}%0A` +
+                        `*UPI to Pay:* ${adminUPI}%0A%0A` +
+                        `Kripya mera payment process karein. Maine screenshot le liya hai.`;
 
             document.getElementById('wa-link').href = `https://wa.me/917862043514?text=${waMsg}`;
             
-            alert("QR Code taiyar hai! Ab scan karke payment request bhej sakte hain.");
+            alert("Request QR generate ho gaya hai! Iska screenshot lekar WhatsApp karein.");
         }
     </script>
 </body>
