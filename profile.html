@@ -4,46 +4,84 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile - Krishna Ads</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        .profile-container { max-width: 500px; margin: 20px auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        body { background: #f0f2f5; font-family: sans-serif; margin: 0; padding-bottom: 50px; }
+        header { background: #fff; padding: 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        
+        .profile-container { max-width: 500px; margin: 20px auto; background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        
+        /* Stats Styling */
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
         .stat-item { background: #f8f9fa; padding: 15px; border-radius: 10px; text-align: center; border: 1px solid #eee; }
         .stat-item b { font-size: 20px; color: #28a745; display: block; }
-        .feedback-area { margin-top: 25px; border-top: 1px solid #ddd; padding-top: 15px; }
-        textarea { width: 100%; height: 70px; margin-top: 10px; border-radius: 8px; border: 1px solid #ccc; padding: 10px; box-sizing: border-box; }
-        .btn-send { width: 100%; background: #007bff; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; margin-top: 5px; }
+        
+        /* Edit Section */
+        .edit-section { margin-top: 25px; padding-top: 15px; border-top: 2px dashed #eee; }
+        .input-group { margin-bottom: 15px; text-align: left; }
+        label { font-size: 12px; color: #666; font-weight: bold; }
+        input, textarea { width: 100%; padding: 10px; margin-top: 5px; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; outline: none; }
+        
+        .btn { width: 100%; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; margin-top: 10px; }
+        .btn-update { background: #28a745; color: white; }
+        .btn-send { background: #007bff; color: white; }
+        .btn-update:hover { background: #218838; }
+
+        .footer-nav { position: fixed; bottom: 0; width: 100%; background: #fff; display: flex; justify-content: space-around; padding: 10px 0; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); }
+        .footer-nav a { text-decoration: none; color: #666; font-size: 12px; text-align: center; }
     </style>
 </head>
 <body>
+
     <header>
-        <h1>My Profile</h1>
-        <nav><a href="home.html">Home</a> | <a href="earning.html">Wallet</a></nav>
+        <h2 style="margin:0; color:#28a745; font-size: 20px;">My Profile</h2>
+        <a href="home.html" style="text-decoration:none; color:#666;"><i class="fas fa-times"></i></a>
     </header>
 
     <div class="profile-container">
-        <div style="text-align: center;">
-            <h2 id="p-name">Loading...</h2>
-            <p id="p-mobile" style="color: #666;"></p>
+        <div style="text-align: center; margin-bottom: 20px;">
+            <div style="width:80px; height:80px; background:#e8f5e9; border-radius:50%; display:flex; align-items:center; justify-content:center; margin: 0 auto 10px;">
+                <i class="fas fa-user-edit" style="font-size:30px; color:#28a745;"></i>
+            </div>
+            <h2 id="p-name" style="margin:0;">Loading...</h2>
+            <p id="p-mobile" style="color: #666; margin:5px 0;"></p>
         </div>
 
         <div class="stats-grid">
             <div class="stat-item"><b>₹<span id="p-bal">0.00</span></b>Balance</div>
-            <div class="stat-item"><b id="p-reels">0</b>Reels Watched</div>
-            <div class="stat-item"><b id="p-posts">0</b>Posts Viewed</div>
-            <div class="stat-item"><b id="p-movies">0</b>Movies Watched</div>
+            <div class="stat-item"><b id="p-reels">0</b>Reels Done</div>
+            <div class="stat-item"><b id="p-posts">0</b>Posts Done</div>
+            <div class="stat-item"><b id="p-movies">0</b>Movies Done</div>
         </div>
 
-        <div class="stat-item" style="margin-top: 10px; background: #fff3cd;">
-            <b id="p-watchtime">0m 0s</b>
-            Total Watch Time
+        <div class="stat-item" style="margin-top: 10px; background: #fff3cd; border-color: #ffeeba;">
+            <b id="p-watchtime">0m 0s</b>Total Watch Time
         </div>
 
-        <div class="feedback-area">
-            <h4>Send Feedback to Admin</h4>
-            <textarea id="f-text" placeholder="Type your message here..."></textarea>
-            <button class="btn-send" onclick="submitFeedback()">Send Feedback</button>
+        <div class="edit-section">
+            <h4><i class="fas fa-user-cog"></i> Update Information</h4>
+            <div class="input-group">
+                <label>Full Name</label>
+                <input type="text" id="edit-name" placeholder="Enter new name">
+            </div>
+            <div class="input-group">
+                <label>Mobile Number (GPay/WhatsApp)</label>
+                <input type="number" id="edit-mobile" placeholder="Enter new number">
+            </div>
+            <button class="btn btn-update" onclick="updateProfile()">Update Details</button>
         </div>
+
+        <div class="edit-section">
+            <h4><i class="fas fa-comment-dots"></i> Admin Feedback</h4>
+            <textarea id="f-text" placeholder="Type your suggestion or issue..."></textarea>
+            <button class="btn btn-send" onclick="submitFeedback()">Send to Admin</button>
+        </div>
+    </div>
+
+    <div class="footer-nav">
+        <a href="home.html"><i class="fas fa-home"></i><br>Home</a>
+        <a href="earning.html"><i class="fas fa-wallet"></i><br>Wallet</a>
+        <a href="profile.html" style="color:#28a745;"><i class="fas fa-user"></i><br>Profile</a>
     </div>
 
     <script>
@@ -52,37 +90,64 @@
             return b ? b.pop() : null;
         }
 
-        // Load Details
-        const user = JSON.parse(decodeURIComponent(getCookie("user_profile") || "{}"));
-        document.getElementById('p-name').innerText = user.name || "User";
-        document.getElementById('p-mobile').innerText = user.mobile || "";
-        document.getElementById('p-bal').innerText = getCookie("balance") || "0.00";
+        function setCookie(n, v) {
+            document.cookie = `${n}=${v};expires=${new Date(Date.now()+31536000000).toUTCString()};path=/`;
+        }
 
-        // Stats & Watch Time Calculation
-        let r = JSON.parse(localStorage.getItem('seen_reel')) || [];
-        let p = JSON.parse(localStorage.getItem('seen_post')) || [];
-        let m = JSON.parse(localStorage.getItem('seen_movie')) || [];
+        // --- LOAD DATA ---
+        const rawProfile = getCookie("user_profile");
+        const user = rawProfile ? JSON.parse(decodeURIComponent(rawProfile)) : {name: "User", mobile: ""};
+        
+        function loadUI() {
+            document.getElementById('p-name').innerText = user.name;
+            document.getElementById('p-mobile').innerText = "+91 " + user.mobile;
+            document.getElementById('edit-name').value = user.name;
+            document.getElementById('edit-mobile').value = user.mobile;
+            document.getElementById('p-bal').innerText = getCookie("balance") || "0.00";
 
-        document.getElementById('p-reels').innerText = r.length;
-        document.getElementById('p-posts').innerText = p.length;
-        document.getElementById('p-movies').innerText = m.length;
+            // Stats
+            let r = JSON.parse(localStorage.getItem('seen_reel')) || [];
+            let p = JSON.parse(localStorage.getItem('seen_post')) || [];
+            let m = JSON.parse(localStorage.getItem('seen_movie')) || [];
+            document.getElementById('p-reels').innerText = r.length;
+            document.getElementById('p-posts').innerText = p.length;
+            document.getElementById('p-movies').innerText = m.length;
 
-        // Total Time: Reel(30s), Post(10s), Movie(120s)
-        let totalSeconds = (r.length * 30) + (p.length * 10) + (m.length * 120);
-        let mins = Math.floor(totalSeconds / 60);
-        let secs = totalSeconds % 60;
-        document.getElementById('p-watchtime').innerText = `${mins}m ${secs}s`;
+            let totalSecs = (r.length * 30) + (p.length * 10) + (m.length * 120);
+            document.getElementById('p-watchtime').innerText = `${Math.floor(totalSecs/60)}m ${totalSecs%60}s`;
+        }
+        loadUI();
+
+        // --- UPDATE LOGIC ---
+        function updateProfile() {
+            let newName = document.getElementById('edit-name').value.trim();
+            let newMobile = document.getElementById('edit-mobile').value.trim();
+
+            if(newName.length < 3 || newMobile.length < 10) {
+                alert("Please enter valid name and 10-digit mobile number!");
+                return;
+            }
+
+            // Save to Cookie
+            user.name = newName;
+            user.mobile = newMobile;
+            setCookie("user_profile", encodeURIComponent(JSON.stringify(user)));
+            
+            alert("Profile Updated Successfully!");
+            window.location.reload(); // UI refresh
+        }
 
         function submitFeedback() {
             let msg = document.getElementById('f-text').value;
-            if(!msg) return;
-            // Feedback save logic (LocalStorage for Admin display)
+            if(!msg) return alert("Please type something!");
+            
             let feeds = JSON.parse(localStorage.getItem('admin_feeds')) || [];
-            feeds.push({ user: user.name, text: msg, time: new Date().toLocaleString() });
+            feeds.push({ user: user.name, mobile: user.mobile, text: msg, time: new Date().toLocaleString() });
             localStorage.setItem('admin_feeds', JSON.stringify(feeds));
-            alert("Feedback sent successfully!");
+            
+            alert("Feedback sent! Admin will review it.");
             document.getElementById('f-text').value = "";
         }
     </script>
 </body>
-  </html>
+</html>
