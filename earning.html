@@ -3,102 +3,159 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Earnings - Krishna Ads</title>
+    <title>Withdrawal - Krishna Ads</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        .earning-card {
-            background: #fff;
-            padding: 25px;
-            margin: 20px auto;
-            width: 90%;
-            max-width: 400px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        body { background: #f0f2f5; font-family: sans-serif; margin: 0; padding-bottom: 50px; }
+        header { background: #fff; padding: 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        
+        .earning-container { max-width: 500px; margin: 20px auto; padding: 15px; }
+        
+        /* User Info Card */
+        .user-info-card {
+            background: #fff; padding: 20px; border-radius: 15px; margin-bottom: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-left: 5px solid #28a745;
         }
-        .balance-amount {
-            font-size: 32px;
-            color: #28a745;
-            font-weight: bold;
-            margin: 10px 0;
+        .user-info-card h2 { margin: 0; color: #333; font-size: 20px; }
+        .user-info-card p { margin: 5px 0; color: #666; font-size: 14px; }
+
+        /* Stats Grid */
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; }
+        .stat-box { background: #f8f9fa; padding: 10px; border-radius: 10px; text-align: center; border: 1px solid #eee; }
+        .stat-box b { color: #28a745; font-size: 16px; }
+
+        /* Balance Section */
+        .balance-card {
+            background: #28a745; color: white; padding: 25px; border-radius: 15px;
+            text-align: center; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(40,167,69,0.3);
         }
+        .balance-amount { font-size: 40px; font-weight: bold; margin: 10px 0; }
+
+        /* Withdrawal Area */
         .qr-section {
-            display: none; /* Default hidden, show on withdraw click */
-            margin-top: 20px;
-            padding: 15px;
-            border: 2px dashed #ccc;
-            border-radius: 10px;
+            display: none; background: #fff; padding: 20px; border-radius: 15px;
+            margin-top: 20px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
-        .qr-placeholder {
-            width: 200px;
-            height: 200px;
-            background: #eee;
-            margin: 10px auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid #ddd;
+        .qr-box { width: 200px; height: 200px; margin: 15px auto; border: 5px solid #f0f0f0; }
+        
+        .btn {
+            width: 100%; padding: 15px; border: none; border-radius: 10px;
+            font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s;
         }
-        .withdraw-btn {
-            background: #007bff;
-            color: white;
-            padding: 12px 25px;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-            width: 100%;
-        }
+        .withdraw-btn { background: #007bff; color: white; }
+        .whatsapp-btn { background: #25D366; color: white; margin-top: 15px; display: none; text-decoration: none; }
+        
+        .footer-nav { position: fixed; bottom: 0; width: 100%; background: #fff; display: flex; justify-content: space-around; padding: 10px 0; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); }
+        .footer-nav a { text-decoration: none; color: #666; font-size: 12px; text-align: center; }
     </style>
 </head>
 <body>
+
     <header>
-        <h1>Krishna Ads</h1>
-        <nav>
-            <a href="home.html">Home</a>
-            <a href="earning.html">Earning</a>
-            <a href="profile.html">Profile</a>
-        </nav>
+        <span style="font-weight:bold; color:#28a745;">KRISHNA ADS</span>
+        <a href="profile.html" style="text-decoration:none; color:#333;"><i class="fas fa-user-circle"></i> Profile</a>
     </header>
 
-    <div class="earning-card">
-        <h3>Total Earning</h3>
-        <p class="balance-amount">₹<span id="display-balance">0.00</span></p>
-        <p style="color: #666; font-size: 14px;">10 Paisa added for last view</p>
-        
-        <button class="withdraw-btn" onclick="generateWithdrawQR()">Withdraw Amount</button>
+    <div class="earning-container">
+        <div class="user-info-card">
+            <h2 id="u-name">Loading...</h2>
+            <p id="u-phone">Mobile: --</p>
+            <p id="u-time" style="color:#28a745; font-weight:bold;">Watch Time: 0m 0s</p>
+            
+            <div class="stats-grid">
+                <div class="stat-box"><b id="s-reels">0</b><br><span>Reels</span></div>
+                <div class="stat-box"><b id="s-posts">0</b><br><span>Posts</span></div>
+                <div class="stat-box"><b id="s-movies">0</b><br><span>Movies</span></div>
+            </div>
+        </div>
+
+        <div class="balance-card">
+            <span>Available Balance</span>
+            <div class="balance-amount">₹<span id="display-balance">0.00</span></div>
+            <p style="font-size:12px; opacity:0.8;">Minimum Withdrawal: ₹100</p>
+        </div>
+
+        <button class="btn withdraw-btn" onclick="generateWithdraw()">Request Withdrawal</button>
 
         <div id="qr-area" class="qr-section">
-            <h4>Scan to Request Payment</h4>
-            <div class="qr-placeholder">
-                <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=PAYMENT_REQUEST_USER" alt="QR Code">
+            <h4>Withdrawal Request QR</h4>
+            <div class="qr-box">
+                <img id="qr-img" src="" alt="Withdrawal QR" style="width:100%;">
             </div>
-            <p style="font-size: 12px; color: red;">Take a screenshot and send to Admin</p>
+            <p style="font-size:12px; color:#666;">Scan details above or use button below</p>
+            
+            <a id="wa-link" href="#" class="btn whatsapp-btn">
+                <i class="fab fa-whatsapp"></i> Send Request to Admin
+            </a>
         </div>
     </div>
 
+    <div class="footer-nav">
+        <a href="home.html"><i class="fas fa-home"></i><br>Home</a>
+        <a href="earning.html" style="color:#28a745;"><i class="fas fa-wallet"></i><br>Wallet</a>
+        <a href="contact.html"><i class="fas fa-headset"></i><br>Support</a>
+    </div>
+
     <script>
-        // Cookie se balance nikalne ka function
-        function getCookie(name) {
-            let nameEQ = name + "=";
-            let ca = document.cookie.split(';');
-            for(let i=0;i < ca.length;i++) {
-                let c = ca[i].trim();
-                if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
-            }
-            return "0.00";
+        // --- DATA LOADING ---
+        function getCookie(n) {
+            let b = document.cookie.match('(^|;)\\s*' + n + '\\s*=\\s*([^;]+)');
+            return b ? b.pop() : "0.00";
         }
 
-        // Page load hote hi balance update karein
-        document.getElementById('display-balance').innerText = getCookie("balance");
+        const userProfile = JSON.parse(decodeURIComponent(getCookie("user_profile") || "{}"));
+        const balance = getCookie("balance");
 
-        function generateWithdrawQR() {
-            let balance = parseFloat(getCookie("balance"));
-            if(balance < 1) {
-                alert("Minimum ₹1 balance chahiye withdraw ke liye.");
-            } else {
-                document.getElementById('qr-area').style.display = 'block';
-                alert("QR Code generate ho gaya hai. Isse scan karke admin ko bhej dein.");
+        // Load Header & Info
+        document.getElementById('u-name').innerText = userProfile.name || "User";
+        document.getElementById('u-phone').innerText = "Mobile: " + (userProfile.mobile || "N/A");
+        document.getElementById('display-balance').innerText = balance;
+
+        // Stats Calculation
+        let r = JSON.parse(localStorage.getItem('seen_reel')) || [];
+        let p = JSON.parse(localStorage.getItem('seen_post')) || [];
+        let m = JSON.parse(localStorage.getItem('seen_movie')) || [];
+
+        document.getElementById('s-reels').innerText = r.length;
+        document.getElementById('s-posts').innerText = p.length;
+        document.getElementById('s-movies').innerText = m.length;
+
+        // Watch Time Calculation
+        let totalSecs = (r.length * 30) + (p.length * 10) + (m.length * 120);
+        let mins = Math.floor(totalSecs / 60);
+        let secs = totalSecs % 60;
+        document.getElementById('u-time').innerText = "Total Watch Time: " + mins + "m " + secs + "s";
+
+        // --- WITHDRAWAL LOGIC ---
+        function generateWithdraw() {
+            let balAmt = parseFloat(balance);
+            
+            if(balAmt < 100) {
+                alert("Minimum ₹100 chahiye withdraw ke liye. Aapka balance: ₹" + balAmt);
+                return;
             }
+
+            // QR Data String
+            let qrData = `USER:${userProfile.name}|MOB:${userProfile.mobile}|BAL:₹${balAmt}|TIME:${mins}m`;
+            let qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(qrData)}`;
+            
+            document.getElementById('qr-img').src = qrUrl;
+            document.getElementById('qr-area').style.display = 'block';
+            document.getElementById('wa-link').style.display = 'block';
+
+            // WhatsApp Message Logic
+            let waMessage = `*New Withdrawal Request*%0A%0A` +
+                            `*Name:* ${userProfile.name}%0A` +
+                            `*Phone:* ${userProfile.mobile}%0A` +
+                            `*Balance:* ₹${balAmt}%0A` +
+                            `*Watch Time:* ${mins}m ${secs}s%0A` +
+                            `*Total Ads:* ${r.length + p.length + m.length}%0A%0A` +
+                            `Please process my payment.`;
+
+            document.getElementById('wa-link').href = `https://wa.me/917862043514?text=${waMessage}`;
+            
+            alert("QR Code and WhatsApp link generated!");
         }
     </script>
 </body>
