@@ -3,115 +3,164 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Krishna Ads - Premium Dashboard</title>
-    <link rel="stylesheet" href="css/style.css">
+    <title>Krishna Ads - Final Premium Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* Modern UI Styles */
-        body { background-color: #f0f2f5; margin: 0; padding-bottom: 60px; }
-        
-        /* Interactive Feedback Ticker */
-        #ticker-container {
-            background: #1a1a1a; color: #00ff00; padding: 10px;
-            overflow: hidden; white-space: nowrap; font-size: 14px;
-            border-bottom: 2px solid #28a745;
-        }
-        #ticker-text { display: inline-block; animation: scrollText 25s linear infinite; }
-        @keyframes scrollText {
-            0% { transform: translateX(100%); }
-            100% { transform: translateX(-100%); }
+        :root {
+            --primary-green: #28a745;
+            --dark-bg: #1a1a1a;
+            --light-gray: #f0f2f5;
+            --white: #ffffff;
         }
 
-        /* Ad Overlay */
+        body { 
+            background-color: var(--light-gray); 
+            margin: 0; 
+            padding-top: 65px; 
+            padding-bottom: 75px; 
+            font-family: 'Segoe UI', Roboto, sans-serif; 
+        }
+        
+        /* --- FIXED HEADER --- */
+        header { 
+            background: var(--white); 
+            padding: 0 20px; 
+            height: 60px;
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: fixed; 
+            top: 0; left: 0; right: 0;
+            z-index: 1000;
+        }
+
+        .logo { color: var(--primary-green); font-size: 22px; font-weight: bold; text-decoration: none; }
+        
+        .header-links { display: flex; gap: 15px; }
+        .header-links a { text-decoration: none; color: #444; font-size: 14px; font-weight: 600; }
+        .header-links a:hover { color: var(--primary-green); }
+
+        .wallet-display { background: #e8f5e9; padding: 5px 12px; border-radius: 20px; color: var(--primary-green); font-weight: bold; border: 1px solid #c8e6c9; font-size: 14px; }
+
+        @media (max-width: 650px) { .header-links { display: none; } }
+
+        /* --- TICKER --- */
+        #ticker-container {
+            background: var(--dark-bg); color: #00ff00; padding: 8px;
+            overflow: hidden; white-space: nowrap; font-size: 13px;
+            border-bottom: 2px solid var(--primary-green);
+        }
+        #ticker-text { display: inline-block; animation: scrollText 30s linear infinite; }
+        @keyframes scrollText { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+
+        /* --- STATS BAR --- */
+        .stats-bar { 
+            background: var(--white); margin: 15px 10px; padding: 15px; border-radius: 12px; 
+            display: flex; justify-content: space-around; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .stat-item { text-align: center; }
+        .stat-item b { font-size: 18px; color: #333; display: block; }
+        .stat-item span { font-size: 11px; color: #777; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* --- GRID CONTAINER --- */
+        .container { max-width: 900px; margin: auto; padding: 10px; display: grid; grid-template-columns: 1fr; gap: 15px; }
+        @media(min-width: 600px) { .container { grid-template-columns: 1fr 1fr 1fr; } }
+
+        /* --- AD CARDS --- */
+        .ad-box {
+            background: var(--white); border-radius: 15px; padding: 25px; text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08); cursor: pointer; transition: transform 0.2s;
+            border-top: 5px solid var(--primary-green);
+        }
+        .ad-box:active { transform: scale(0.96); }
+        .ad-box i { font-size: 40px; color: var(--primary-green); margin-bottom: 12px; }
+        .ad-box h3 { margin: 5px 0; font-size: 18px; color: #333; }
+        .ad-box p { color: var(--primary-green); font-weight: bold; margin: 10px 0 0 0; font-size: 15px; }
+
+        /* --- FOOTER NAV --- */
+        footer { 
+            background: var(--white); position: fixed; bottom: 0; width: 100%; 
+            display: flex; justify-content: space-around; padding: 12px 0; 
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1); z-index: 1000;
+        }
+        .footer-item { text-align: center; color: #666; text-decoration: none; font-size: 11px; font-weight: 500; }
+        .footer-item i { font-size: 20px; display: block; margin-bottom: 4px; }
+        .footer-item:active, .footer-item.active { color: var(--primary-green); }
+
+        /* --- OVERLAY PLAYER --- */
         #ad-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #000; z-index: 9999; flex-direction: column; align-items: center; justify-content: center;
         }
         .timer-display { 
-            position: absolute; top: 20px; font-size: 26px; color: #fff;
-            background: rgba(40, 167, 69, 0.8); padding: 8px 25px; border-radius: 50px;
-            font-weight: bold; z-index: 10000;
+            position: absolute; top: 30px; font-size: 24px; color: #fff;
+            background: rgba(40, 167, 69, 0.9); padding: 10px 30px; border-radius: 50px;
+            font-weight: bold; z-index: 10000; border: 2px solid #fff;
         }
-
-        /* Responsive Container */
-        .container { max-width: 800px; margin: auto; padding: 20px; display: grid; grid-template-columns: 1fr; gap: 15px; }
-        @media(min-width: 600px) { .container { grid-template-columns: 1fr 1fr 1fr; } }
-
-        /* Fancy Ad Cards */
-        .ad-box {
-            background: #fff; border-radius: 15px; padding: 25px; text-align: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05); cursor: pointer; transition: 0.3s;
-            border-bottom: 4px solid #28a745;
-        }
-        .ad-box:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
-        .ad-box h3 { margin: 10px 0; color: #333; }
-        .ad-box p { color: #28a745; font-weight: bold; margin: 5px 0; }
-
-        /* Stats Bar */
-        .stats-bar { background: #fff; margin: 15px 20px; padding: 15px; border-radius: 10px; display: flex; justify-content: space-around; font-size: 13px; text-align: center; }
-        
-        /* Footer */
-        footer { background: #333; color: white; padding: 30px 20px; text-align: center; margin-top: 50px; }
-        .footer-links a { color: #00ff00; text-decoration: none; margin: 0 10px; font-size: 14px; }
-        
-        .media-fit { max-width: 100%; max-height: 100%; object-fit: contain; }
-
-        /* Floating Button */
-        .float-profile { position: fixed; bottom: 20px; right: 20px; background: #28a745; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; text-decoration: none; font-weight: bold; box-shadow: 0 5px 15px rgba(0,0,0,0.3); z-index: 100; }
+        .media-fit { max-width: 100%; max-height: 90vh; object-fit: contain; }
+        .spinner { border: 4px solid rgba(255,255,255,0.3); border-top: 4px solid var(--primary-green); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 10px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-    <div id="ticker-container">
-        <div id="ticker-text">Welcome Krushn Kant! • New Member joined: Aryan • Top Earner: ₹150.00 today • Support WhatsApp: +91 0000000000 • Please send your feedback from Profile page!</div>
-    </div>
-
-    <header style="background: #fff; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-        <h2 style="margin:0; color: #28a745;">Krishna Ads</h2>
-        <div style="font-size: 14px; font-weight: bold;">Wallet: ₹<span id="nav-bal" style="color:#28a745;">0.00</span></div>
+    <header>
+        <a href="home.html" class="logo">Krishna Ads</a>
+        <nav class="header-links">
+            <a href="home.html">Home</a>
+            <a href="about.html">About</a>
+            <a href="contact.html">Contact</a>
+            <a href="earning.html">Withdraw</a>
+        </nav>
+        <div class="wallet-display"><i class="fas fa-wallet"></i> ₹<span id="nav-bal">0.00</span></div>
     </header>
 
+    <div id="ticker-container">
+        <div id="ticker-text">Welcome Krushn Kant! • Daily tasks are reset • Check Profile to send feedback • WhatsApp Support: +91 7862043514 • Payments are processed every Sunday!</div>
+    </div>
+
     <div class="stats-bar">
-        <div><b id="stat-reels">0</b><br>Reels</div>
-        <div><b id="stat-posts">0</b><br>Posts</div>
-        <div><b id="stat-movies">0</b><br>Movies</div>
+        <div class="stat-item"><b id="stat-reels">0</b><span>Reels</span></div>
+        <div class="stat-item"><b id="stat-posts">0</b><span>Posts</span></div>
+        <div class="stat-item"><b id="stat-movies">0</b><span>Movies</span></div>
     </div>
 
     <div class="container">
         <div class="ad-box" onclick="startTask('reel')">
-            <img src="https://cdn-icons-png.flaticon.com/512/9326/9326463.png" width="50">
-            <h3>Watch Reels</h3>
-            <p>Earn ₹0.10</p>
+            <i class="fas fa-play-circle"></i>
+            <h3>Reels Task</h3>
+            <p>+ ₹0.10</p>
         </div>
         <div class="ad-box" onclick="startTask('post')">
-            <img src="https://cdn-icons-png.flaticon.com/512/1160/1160358.png" width="50">
-            <h3>Daily Posts</h3>
-            <p>Earn ₹0.06</p>
+            <i class="fas fa-image"></i>
+            <h3>Daily Post</h3>
+            <p>+ ₹0.06</p>
         </div>
         <div class="ad-box" onclick="startTask('movie')">
-            <img src="https://cdn-icons-png.flaticon.com/512/4221/4221419.png" width="50">
-            <h3>Short Movies</h3>
-            <p>Earn ₹0.50</p>
+            <i class="fas fa-film"></i>
+            <h3>Short Movie</h3>
+            <p>+ ₹0.50</p>
         </div>
     </div>
 
     <footer>
-        <div class="footer-links">
-            <a href="home.html">Home</a> | 
-            <a href="earning.html">Withdraw</a> | 
-            <a href="profile.html">My Stats</a>
-        </div>
-        <p style="font-size: 12px; margin-top: 15px; color: #bbb;">Contact: support@krishnaads.com<br>WhatsApp Support: +91 XXXXXXXXXX</p>
-        <p style="font-size: 10px; color: #777;">&copy; 2026 Krishna Advertisement. All Rights Reserved.</p>
+        <a href="home.html" class="footer-item active"><i class="fas fa-home"></i>Home</a>
+        <a href="about.html" class="footer-item"><i class="fas fa-info-circle"></i>About</a>
+        <a href="contact.html" class="footer-item"><i class="fas fa-envelope"></i>Contact</a>
+        <a href="profile.html" class="footer-item"><i class="fas fa-user-circle"></i>Profile</a>
     </footer>
 
     <div id="ad-overlay">
-        <div id="load-info" style="color:white;">Loading Content...</div>
-        <div id="time-box" class="timer-display" style="display:none;">Wait: <span id="countdown">0</span>s</div>
+        <div id="load-info" style="text-align:center; color:white;">
+            <div class="spinner"></div>
+            Loading Advertisement...
+        </div>
+        <div id="time-box" class="timer-display" style="display:none;">
+            <i class="fas fa-clock"></i> <span id="countdown">0</span>s
+        </div>
         <div id="media-wrap" style="width:100%; height:100%; display:flex; justify-content:center; align-items:center;"></div>
-        <div style="position:absolute; bottom:20px; color:#555; font-size:12px;">Security: Task cannot be skipped</div>
     </div>
-
-    <a href="profile.html" class="float-profile">Profile</a>
 
     <script>
         const postDatabase = [
@@ -146,6 +195,7 @@
             document.getElementById('ad-overlay').style.display = 'flex';
             document.getElementById('load-info').style.display = 'block';
             document.getElementById('time-box').style.display = 'none';
+            document.getElementById('media-wrap').innerHTML = "";
             
             let selectedId = "";
             let duration = 0;
@@ -154,7 +204,7 @@
                 if(type === 'post') {
                     let seen = JSON.parse(localStorage.getItem('seen_post')) || [];
                     let available = postDatabase.filter(i => !seen.includes(i));
-                    if(available.length === 0) { hideAd(); return alert("No more posts!"); }
+                    if(available.length === 0) { hideAd(); return alert("Tasks finished for today!"); }
                     selectedId = available[Math.floor(Math.random()*available.length)];
                     duration = 10;
                     renderMedia(`<img src="upload-add/post/${selectedId}" class="media-fit" onload="runTimer(${duration},'${type}','${selectedId}')">`);
@@ -164,12 +214,12 @@
                     const ids = text.split('\n').map(s=>s.trim()).filter(s=>s!=="");
                     let seen = JSON.parse(localStorage.getItem(`seen_${type}`)) || [];
                     let available = ids.filter(i => !seen.includes(i));
-                    if(available.length === 0) { hideAd(); return alert(`All ${type}s done!`); }
+                    if(available.length === 0) { hideAd(); return alert(`All ${type}s viewed!`); }
                     selectedId = available[Math.floor(Math.random()*available.length)];
                     duration = type === 'reel' ? 30 : 120;
-                    renderMedia(`<iframe src="https://www.youtube.com/embed/${selectedId}?autoplay=1&mute=1&controls=0&rel=0" class="media-fit" style="width:100vw; height:56.25vw; max-height:100vh;" onload="runTimer(${duration},'${type}','${selectedId}')" frameborder="0" allow="autoplay"></iframe>`);
+                    renderMedia(`<iframe src="https://www.youtube.com/embed/${selectedId}?autoplay=1&mute=1&controls=0&rel=0" class="media-fit" style="width:100vw; height:56.25vw; border:none;" onload="runTimer(${duration},'${type}','${selectedId}')" allow="autoplay"></iframe>`);
                 }
-            } catch(e) { hideAd(); alert("Connection Error!"); }
+            } catch(e) { hideAd(); alert("Error connecting to server. Check .txt files."); }
         }
 
         function renderMedia(html) { document.getElementById('media-wrap').innerHTML = html; }
@@ -193,7 +243,7 @@
             localStorage.setItem(`seen_${type}`, JSON.stringify(seen));
             let r = type === 'reel' ? 0.10 : (type === 'post' ? 0.06 : 0.50);
             setCookie("balance", (parseFloat(getCookie("balance")) + r).toFixed(2));
-            alert("Reward Earned: ₹" + r);
+            alert("Reward: ₹" + r + " added.");
             window.location.reload();
         }
 
@@ -202,4 +252,4 @@
         function getCookie(n) { let b = document.cookie.match('(^|;)\\s*'+n+'\\s*=\\s*([^;]+)'); return b ? b.pop() : "0.00"; }
     </script>
 </body>
-    </html>
+</html>
