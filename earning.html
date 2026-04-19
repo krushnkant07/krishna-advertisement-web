@@ -131,8 +131,8 @@
         function generateWithdraw() {
             let balAmt = parseFloat(balance);
             
-            if(balAmt < 100) {
-                alert("Minimum ₹100 chahiye withdraw ke liye. Aapka balance: ₹" + balAmt);
+            if(balAmt < 1) {
+                alert("Minimum ₹1 chahiye withdraw ke liye. Aapka balance: ₹" + balAmt);
                 return;
             }
 
