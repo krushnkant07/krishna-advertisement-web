@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signup - Krishna Ads</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="auth-container">
+        <h2>Create Account</h2>
+        <input type="text" id="reg-name" placeholder="Full Name">
+        <input type="number" id="reg-mobile" placeholder="Mobile Number">
+        <input type="email" id="reg-email" placeholder="Email Address">
+        <input type="password" id="reg-pass" placeholder="Create Password">
+        <button onclick="registerUser()">Sign Up</button>
+        <p>Already have an account? <a href="index.html">Login</a></p>
+    </div>
+
+    <script>
+        function setCookie(n, v) {
+            const d = new Date();
+            d.setTime(d.getTime() + (365*24*60*60*1000));
+            document.cookie = n + "=" + v + ";expires=" + d.toUTCString() + ";path=/";
+        }
+
+        function registerUser() {
+            const userData = {
+                name: document.getElementById('reg-name').value,
+                mobile: document.getElementById('reg-mobile').value,
+                email: document.getElementById('reg-email').value,
+                pass: document.getElementById('reg-pass').value
+            };
+
+            if(!userData.name || !userData.mobile || !userData.pass) {
+                alert("Please fill all details!");
+                return;
+            }
+
+            // User info 1 saal ke liye save
+            setCookie("user_profile", JSON.stringify(userData));
+            setCookie("balance", "0.00"); // Naya user balance 0
+            
+            alert("Account Created Successfully!");
+            window.location.href = "index.html";
+        }
+    </script>
+</body>
+  </html>
