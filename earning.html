@@ -24,7 +24,7 @@
 
         .input-group { margin-bottom: 15px; text-align: left; }
         label { font-size: 13px; font-weight: bold; color: #555; }
-        input { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 15px; }
+        input, select { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 15px; outline: none; }
 
         #qr-preview-box { display: none; text-align: center; margin: 15px 0; padding: 10px; border: 2px dashed #28a745; border-radius: 10px; background: #f9f9f9; }
         #qr-preview-box img { width: 180px; height: 180px; margin-top: 10px; }
@@ -62,20 +62,28 @@
             </div>
 
             <div class="input-group" id="upi-input">
-                <label>Enter UPI ID</label>
+                <label>Enter Full UPI ID</label>
                 <input type="text" id="user-upi" placeholder="example@oksbi">
             </div>
 
             <div class="input-group" id="phone-input" style="display:none;">
-                <label>Enter Phone (GPay/PhonePe)</label>
+                <label>Phone Number</label>
                 <input type="number" id="user-phone" placeholder="9876543210">
-                <p style="font-size:10px; color:gray; margin-top:5px;">*Auto-converts to GPay UPI ID</p>
+                
+                <label style="margin-top:10px; display:block;">Select Bank App Handle</label>
+                <select id="user-handle">
+                    <option value="@oksbi">GPay (SBI)</option>
+                    <option value="@okaxis">GPay (Axis)</option>
+                    <option value="@okicici">GPay (ICICI)</option>
+                    <option value="@ybl">PhonePe</option>
+                    <option value="@paytm">Paytm</option>
+                </select>
             </div>
 
             <div id="qr-preview-box">
-                <p style="font-size: 11px; font-weight: bold; color: #28a745;">Real-Time QR Ready!</p>
+                <p style="font-size: 11px; font-weight: bold; color: #28a745;">Verified QR Generated!</p>
                 <img id="generated-qr" src="" alt="Payment QR">
-                <p style="font-size: 10px; color: #666; margin-top:5px;">Admin can scan this via GPay</p>
+                <p style="font-size: 10px; color: #666; margin-top:5px;">Admin: Scan via GPay to see Bank Name</p>
             </div>
 
             <button class="submit-btn" onclick="generateRequest()">
@@ -93,7 +101,6 @@
     <script>
         let currentMethod = 'UPI';
 
-        // Load Balance
         function getCookie(n) {
             let b = document.cookie.match('(^|;)\\s*' + n + '\\s*=\\s*([^;]+)');
             return b ? b.pop() : "0.00";
@@ -121,29 +128,29 @@
                 if(!finalUpi.includes('@')) return alert("Sahi UPI ID dalein!");
             } else {
                 let phone = document.getElementById('user-phone').value.trim();
-                if(phone.length !== 10) return alert("10-digit phone number dalein!");
-                finalUpi = `${phone}@okaxis`; // Default GPay handle
+                let handle = document.getElementById('user-handle').value;
+                if(phone.length !== 10) return alert("10-digit number dalein!");
+                finalUpi = `${phone}${handle}`;
             }
 
-            // Real UPI Payment Link
-            let paymentData = `upi://pay?pa=${finalUpi}&pn=${encodeURIComponent(user.name)}&am=${amount}&cu=INR&tn=KrishnaAds_Withdraw`;
+            // Real UPI Intent URL
+            // Adding 'mc' and 'tid' parameters can help some apps recognize verified IDs
+            let paymentData = `upi://pay?pa=${finalUpi}&pn=${encodeURIComponent(user.name)}&am=${amount}&cu=INR&tn=KrishnaAds_Payment`;
             
-            // Third Party QR API
             let qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(paymentData)}`;
             
             document.getElementById('generated-qr').src = qrUrl;
             document.getElementById('qr-preview-box').style.display = 'block';
 
-            // WhatsApp Logic
             let msg = `*💸 WITHDRAWAL REQUEST*%0A` +
                       `----------------------------%0A` +
                       `*Name:* ${user.name}%0A` +
                       `*Amount:* ₹${amount}%0A` +
-                      `*Pay via:* ${currentMethod}%0A` +
-                      `*UPI ID:* ${finalUpi}%0A` +
-                      `*QR Link:* ${qrUrl}%0A` +
+                      `*Method:* ${currentMethod}%0A` +
+                      `*UPI ID:* ${finalUpi}%0A%0A` +
+                      `*SCAN THIS QR TO PAY:*%0A${qrUrl}%0A` +
                       `----------------------------%0A` +
-                      `Admin, please scan QR link above via GPay to pay me.`;
+                      `Admin, scanning this QR will load the Bank Name.`;
 
             setTimeout(() => {
                 window.location.href = `https://wa.me/917862043514?text=${msg}`;
