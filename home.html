@@ -1,151 +1,135 @@
-            <!DOCTYPE html>
-<html lang="hi">
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Krishna Ads</title>
+    <title>Home - Krishna Ads</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
-        /* Ad Player Overlay Styling */
+        /* Ad Overlay Design */
         #ad-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.98); z-index: 1000; flex-direction: column;
-            align-items: center; justify-content: center; color: white; text-align: center;
+            background: rgba(0,0,0,1); z-index: 1000; flex-direction: column;
+            align-items: center; justify-content: center; color: white;
         }
-        .timer-display { font-size: 30px; color: #00ff00; margin-bottom: 20px; font-weight: bold; }
-        #ad-content video, #ad-content img { 
-            max-width: 90%; max-height: 70vh; border: 3px solid #fff; border-radius: 12px; 
-            box-shadow: 0 0 20px rgba(255,255,255,0.2);
-        }
-        .no-ads-msg { display: block; margin-top: 10px; color: #ff4444; font-size: 13px; font-weight: bold; }
+        .timer-display { font-size: 28px; color: #00ff00; margin-bottom: 15px; font-weight: bold; }
+        video, img { max-width: 90%; max-height: 75%; border: 2px solid white; border-radius: 12px; }
         
-        /* Dashboard Container */
-        .container { display: flex; flex-wrap: wrap; justify-content: center; padding: 20px; gap: 20px; }
+        /* Dashboard Styling */
+        .container { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; padding: 20px; }
         .ad-box { 
-            background: white; border-radius: 15px; padding: 25px; width: 280px; 
-            cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.1); transition: 0.3s;
-            border-top: 5px solid #28a745;
+            background: #fff; padding: 20px; width: 250px; border-radius: 10px; 
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1); cursor: pointer; text-align: center;
         }
-        .ad-box:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.2); }
+        .ad-box:hover { background: #f0f0f0; transform: scale(1.02); }
     </style>
 </head>
 <body>
     <header>
         <h1>Krishna Advertisement</h1>
-        <nav>
-            <a href="home.html">Home</a> | 
-            <a href="earning.html">Earning</a> |
-            <a href="index.html" onclick="logout()">Logout</a>
-        </nav>
+        <nav><a href="home.html">Home</a> | <a href="earning.html">Earning</a></nav>
     </header>
 
     <div class="container">
         <div class="ad-box" onclick="playRandomAd('reel')">
-            <h3>Watch Reels</h3>
-            <p>Earn ₹0.10 | 30 Seconds</p>
-            <span id="reel-status" class="no-ads-msg"></span>
+            <h3>Watch Random Reel</h3>
+            <p>Earn ₹0.10 | 30s</p>
         </div>
 
         <div class="ad-box" onclick="playRandomAd('post')">
-            <h3>View Posts</h3>
-            <p>Earn ₹0.06 | 10 Seconds</p>
-            <span id="post-status" class="no-ads-msg"></span>
+            <h3>View Random Post</h3>
+            <p>Earn ₹0.06 | 10s</p>
         </div>
 
         <div class="ad-box" onclick="playRandomAd('movie')">
-            <h3>Short Movie Ads</h3>
-            <p>Earn ₹0.50 | 2 Minutes</p>
-            <span id="movie-status" class="no-ads-msg"></span>
+            <h3>Short Movie Ad</h3>
+            <p>Earn ₹0.50 | 2m</p>
         </div>
     </div>
 
     <div id="ad-overlay">
-        <div class="timer-display">Ad Ends In: <span id="countdown">0</span>s</div>
+        <div class="timer-display">Time Remaining: <span id="countdown">0</span>s</div>
         <div id="ad-content"></div>
-        <p style="margin-top: 20px; color: #aaa;">Don't close! Payment will add automatically.</p>
+        <p>Do not close the page to receive reward.</p>
     </div>
 
     <script>
-        // --- ADMIN: APNI FILES KE NAAM YAHAN DAALEIN ---
+        // --- APNI FILES KI LIST YAHAN UPDATE KAREIN ---
         const adDatabase = {
-            reel: ["my_funny_video.mp4", "dance_reel.mp4", "nature_clip.mp4"], 
-            post: ["offer_banner.jpg", "product_image.png", "sale_notice.webp"], 
-            movie: ["action_short.mp4", "drama_scene.mp4"]
+            post: ["1b0536ece6d7c04180ec9bfbc772d2e1.jpg", "221147ea2778af9c1e6c82761e47d01c.jpg", "580fba1deafcf017acd880984461296a.jpg", "787756e0bf5c8282e44ef4471a2874dc.jpg","IMG-20260307-WA0003.jpg", "InShot_20260311_082602526.jpg", "InShot_20260413_213048735.jpg"], 
+            reel: ["video1.mp4"],
+            movie: ["short1.mp4"]
         };
 
         function playRandomAd(type) {
-            // Check seen ads from localStorage
+            // Check seen ads
             let seenAds = JSON.parse(localStorage.getItem(`seen_${type}`)) || [];
-            let availableAds = adDatabase[type].filter(file => !seenAds.includes(file));
+            let availableAds = adDatabase[type].filter(ad => !seenAds.includes(ad));
 
             if (availableAds.length === 0) {
-                alert(`Mubarak ho! Aapne saari ${type}s dekh li hain.`);
-                document.getElementById(`${type}-status`).innerText = "No more ads for today!";
+                alert(`Aapne saari available ${type}s dekh li hain!`);
                 return;
             }
 
-            // Select random file
-            let selectedFile = availableAds[Math.floor(Math.random() * availableAds.length)];
+            // Random selection
+            let randomAd = availableAds[Math.floor(Math.random() * availableAds.length)];
             
-            // Set paths and timers
-            let folder = (type === 'reel') ? 'reels' : (type === 'post' ? 'post' : 'short-movie');
-            let duration = (type === 'reel') ? 30 : (type === 'post' ? 10 : 120);
-            let filePath = `upload-add/${folder}/${selectedFile}`;
+            // Path setup - folders ka naam check kar lein
+            let folderMap = { reel: 'reels', post: 'post', movie: 'short-movie' };
+            let path = `upload-add/${folderMap[type]}/${randomAd}`;
+            let duration = type === 'reel' ? 30 : (type === 'post' ? 10 : 120);
 
-            showAdPlayer(type, filePath, duration, selectedFile);
+            console.log("Loading path: " + path); // Debugging ke liye
+            startAdPlayer(type, path, duration, randomAd);
         }
 
-        function showAdPlayer(type, src, time, fileName) {
+        function startAdPlayer(type, src, duration, adFileName) {
             const overlay = document.getElementById('ad-overlay');
             const content = document.getElementById('ad-content');
             const timerText = document.getElementById('countdown');
-
+            
             overlay.style.display = 'flex';
-            timerText.innerText = time;
+            let timeLeft = duration;
+            timerText.innerText = timeLeft;
 
-            // Load Content
+            // Media insertion
             if (type === 'post') {
-                content.innerHTML = `<img src="${src}" onerror="handleError()">`;
+                content.innerHTML = `<img src="${src}" onerror="fileError('${src}')">`;
             } else {
-                content.innerHTML = `<video id="activeVid" src="${src}" autoplay muted playsinline oncontextmenu="return false;"></video>`;
+                content.innerHTML = `<video id="v" src="${src}" autoplay muted playsinline onerror="fileError('${src}')"></video>`;
             }
 
-            // Start Unskippable Timer
-            let timeLeft = time;
-            const timerInterval = setInterval(() => {
+            const interval = setInterval(() => {
                 timeLeft--;
                 timerText.innerText = timeLeft;
-
                 if (timeLeft <= 0) {
-                    clearInterval(timerInterval);
-                    completeTask(type, fileName);
+                    clearInterval(interval);
+                    finishAd(type, adFileName);
                 }
             }, 1000);
         }
 
-        function completeTask(type, fileName) {
-            // 1. Mark as seen
+        function finishAd(type, adFileName) {
+            // Mark as seen
             let seenAds = JSON.parse(localStorage.getItem(`seen_${type}`)) || [];
-            seenAds.push(fileName);
+            seenAds.push(adFileName);
             localStorage.setItem(`seen_${type}`, JSON.stringify(seenAds));
 
-            // 2. Add Money in Cookie (1 Year)
-            let reward = (type === 'reel') ? 0.10 : (type === 'post') ? 0.06 : 0.50;
-            let currentBal = parseFloat(getCookie("balance")) || 0;
-            let newBal = (currentBal + reward).toFixed(2);
-            
-            setCookie("balance", newBal);
+            // Reward calculation
+            let reward = type === 'reel' ? 0.10 : (type === 'post' ? 0.06 : 0.50);
+            let bal = parseFloat(getCookie("balance")) || 0;
+            setCookie("balance", (bal + reward).toFixed(2));
 
-            alert("Kamaal kar diya! ₹" + reward + " aapke wallet mein jud gaye.");
+            alert(`Mubarak ho! ₹${reward} add ho gaye hain.`);
             window.location.href = "earning.html";
         }
 
-        function handleError() {
-            alert("File nahi mili! Check your upload-add folder.");
+        function fileError(src) {
+            alert("File nahi mili! Path check karein: " + src);
             location.reload();
         }
 
-        // --- COOKIE HELPERS ---
+        // Cookie Functions (1 Year Expiry)
         function setCookie(n, v) {
             const d = new Date(); d.setTime(d.getTime() + (365*24*60*60*1000));
             document.cookie = `${n}=${v};expires=${d.toUTCString()};path=/`;
@@ -155,10 +139,6 @@
             let b = document.cookie.match('(^|;)\\s*' + n + '\\s*=\\s*([^;]+)');
             return b ? b.pop() : "0.00";
         }
-
-        function logout() {
-            alert("Logging out...");
-        }
     </script>
 </body>
-    </html>
+</html>
