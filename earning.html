@@ -7,83 +7,103 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { background: #f0f2f5; font-family: sans-serif; margin: 0; padding-bottom: 70px; }
-        header { background: #fff; padding: 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        body { background: #f0f2f5; font-family: 'Segoe UI', sans-serif; margin: 0; padding-bottom: 80px; }
+        header { background: #fff; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         
-        .earning-container { max-width: 500px; margin: 20px auto; padding: 15px; }
+        .earning-container { max-width: 500px; margin: 20px auto; padding: 0 15px; }
         
-        /* User Card */
-        .user-info-card {
+        /* User Profile Info */
+        .user-card {
             background: #fff; padding: 20px; border-radius: 15px; margin-bottom: 20px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-left: 5px solid #28a745;
         }
-        .user-info-card h2 { margin: 0; color: #333; font-size: 20px; }
+        .user-card h2 { margin: 0; color: #333; font-size: 18px; text-transform: capitalize; }
+        .user-card p { margin: 5px 0; color: #666; font-size: 13px; }
 
-        /* Balance Card */
+        /* Stats Section */
+        .stats-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 15px; }
+        .stat-pill { background: #f8f9fa; padding: 8px; border-radius: 8px; text-align: center; border: 1px solid #eee; }
+        .stat-pill b { color: #28a745; font-size: 14px; display: block; }
+        .stat-pill span { font-size: 10px; color: #888; text-transform: uppercase; }
+
+        /* Main Balance Display */
         .balance-card {
-            background: linear-gradient(135deg, #28a745, #218838); color: white; padding: 25px; border-radius: 15px;
-            text-align: center; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(40,167,69,0.3);
+            background: linear-gradient(135deg, #28a745, #1e7e34); color: white; 
+            padding: 30px; border-radius: 20px; text-align: center; 
+            box-shadow: 0 8px 20px rgba(40,167,69,0.3); margin-bottom: 25px;
         }
-        .balance-amount { font-size: 40px; font-weight: bold; margin: 10px 0; }
+        .balance-amount { font-size: 45px; font-weight: bold; margin: 5px 0; letter-spacing: -1px; }
 
-        /* QR Section */
+        /* QR Withdrawal Box */
         .qr-section {
-            display: none; background: #fff; padding: 20px; border-radius: 15px;
-            margin-top: 20px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            display: none; background: #fff; padding: 20px; border-radius: 20px;
+            text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border: 2px solid #28a745;
         }
-        .qr-box { width: 200px; height: 200px; margin: 15px auto; border: 5px solid #f8f9fa; border-radius: 10px; overflow: hidden; }
+        .qr-box { width: 210px; height: 210px; margin: 15px auto; padding: 10px; background: #fff; border-radius: 10px; box-shadow: inset 0 0 10px rgba(0,0,0,0.1); }
         
         .btn {
-            width: 100%; padding: 15px; border: none; border-radius: 10px;
+            width: 100%; padding: 16px; border: none; border-radius: 12px;
             font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s;
         }
-        .withdraw-btn { background: #007bff; color: white; }
-        .whatsapp-btn { background: #25D366; color: white; margin-top: 15px; display: none; text-decoration: none; }
+        .withdraw-btn { background: #007bff; color: white; box-shadow: 0 4px 12px rgba(0,123,255,0.3); }
+        .whatsapp-btn { background: #25D366; color: white; margin-top: 15px; display: none; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 10px; }
         
-        .footer-nav { position: fixed; bottom: 0; width: 100%; background: #fff; display: flex; justify-content: space-around; padding: 10px 0; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); }
-        .footer-nav a { text-decoration: none; color: #666; font-size: 12px; text-align: center; }
+        /* Sticky Bottom Nav */
+        .footer-nav { position: fixed; bottom: 0; width: 100%; background: #fff; display: flex; justify-content: space-around; padding: 12px 0; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); z-index: 100; }
+        .footer-nav a { text-decoration: none; color: #888; font-size: 11px; text-align: center; font-weight: 500; }
+        .footer-nav a i { font-size: 20px; margin-bottom: 4px; display: block; }
+        .footer-nav a.active { color: #28a745; }
     </style>
 </head>
 <body>
 
     <header>
-        <span style="font-weight:bold; color:#28a745;">KRISHNA ADS</span>
-        <a href="profile.html" style="text-decoration:none; color:#333;"><i class="fas fa-user-circle"></i> Profile</a>
+        <span style="font-weight:bold; color:#28a745; font-size: 20px;">KRISHNA ADS</span>
+        <div style="font-size: 12px; color: #666;"><i class="fas fa-shield-alt"></i> Secure Payment</div>
     </header>
 
     <div class="earning-container">
-        <div class="user-info-card">
-            <h2 id="u-name">User Name</h2>
-            <p id="u-phone" style="margin: 5px 0; color: #666;">Mobile: --</p>
-            <p id="u-time" style="color:#28a745; font-weight:bold; font-size: 13px;">Watch Time: --</p>
+        <div class="user-card">
+            <h2 id="u-name">Loading...</h2>
+            <p id="u-phone">Mobile: --</p>
+            <p id="u-time" style="color:#28a745; font-weight:bold;">Watch Time: 0m</p>
+            
+            <div class="stats-row">
+                <div class="stat-pill"><b id="s-reels">0</b><span>Reels</span></div>
+                <div class="stat-pill"><b id="s-posts">0</b><span>Posts</span></div>
+                <div class="stat-pill"><b id="s-movies">0</b><span>Movies</span></div>
+            </div>
         </div>
 
         <div class="balance-card">
-            <span>Payable Balance</span>
+            <span style="font-size: 14px; opacity: 0.9;">Payable Balance</span>
             <div class="balance-amount">₹<span id="display-balance">0.00</span></div>
-            <p style="font-size:12px; opacity:0.9;">Min. Withdrawal: ₹1</p>
+            <p style="font-size: 11px; background: rgba(0,0,0,0.15); display: inline-block; padding: 3px 12px; border-radius: 50px;">Min. Withdraw: ₹1</p>
         </div>
 
-        <button class="btn withdraw-btn" onclick="generateUPI_QR()">Generate GPay QR</button>
+        <button class="btn withdraw-btn" onclick="generateSecureQR()">
+            <i class="fas fa-qrcode"></i> Generate GPay QR
+        </button>
 
         <div id="qr-area" class="qr-section">
-            <h4 style="margin:0;">UPI Payment QR</h4>
-            <p style="font-size:11px; color:#666;">Scan with GPay/PhonePe to Pay Admin</p>
+            <h4 style="margin:0; color:#333;">Payment QR Code</h4>
+            <p style="font-size:11px; color:#666; margin-top:5px;">Scan with GPay, PhonePe or Paytm</p>
             <div class="qr-box">
-                <img id="qr-img" src="" alt="UPI QR" style="width:100%; height:100%;">
+                <img id="qr-img" src="" alt="UPI Payment QR" style="width:100%; height:100%;">
             </div>
-            <p style="font-size:12px; color:red; font-weight:bold;">Screenshot le kar WhatsApp karein!</p>
+            <p style="font-size:12px; color:#dc3545; font-weight:bold; margin-bottom:15px;">Take screenshot & send on WhatsApp!</p>
             
             <a id="wa-link" href="#" class="btn whatsapp-btn">
-                <i class="fab fa-whatsapp"></i> WhatsApp Screenshot to Admin
+                <i class="fab fa-whatsapp" style="font-size:20px;"></i> Send Request to Admin
             </a>
         </div>
     </div>
 
     <div class="footer-nav">
-        <a href="home.html"><i class="fas fa-home"></i><br>Home</a>
-        <a href="earning.html" style="color:#28a745;"><i class="fas fa-wallet"></i><br>Wallet</a>
-        <a href="contact.html"><i class="fas fa-headset"></i><br>Support</a>
+        <a href="home.html"><i class="fas fa-home"></i>Home</a>
+        <a href="earning.html" class="active"><i class="fas fa-wallet"></i>Wallet</a>
+        <a href="contact.html"><i class="fas fa-headset"></i>Support</a>
+        <a href="profile.html"><i class="fas fa-user-circle"></i>Profile</a>
     </div>
 
     <script>
@@ -92,56 +112,62 @@
             return b ? b.pop() : "0.00";
         }
 
-        const userProfile = JSON.parse(decodeURIComponent(getCookie("user_profile") || "{}"));
+        // Load User Data
+        const rawProfile = getCookie("user_profile");
+        const userProfile = rawProfile ? JSON.parse(decodeURIComponent(rawProfile)) : {name: "User", mobile: "N/A"};
         const balance = getCookie("balance");
 
-        // Load UI
-        document.getElementById('u-name').innerText = userProfile.name || "Krushn Kant";
-        document.getElementById('u-phone').innerText = "Mobile: " + (userProfile.mobile || "N/A");
+        document.getElementById('u-name').innerText = userProfile.name;
+        document.getElementById('u-phone').innerText = "Mobile: " + userProfile.mobile;
         document.getElementById('display-balance').innerText = balance;
 
-        function generateUPI_QR() {
-            let balAmt = parseFloat(balance);
-            if(balAmt < 1) {
-                alert("Withdrawal ke liye kam se kam ₹1 hona chahiye.");
-                return;
-            }
-
-            // --- UPI CONFIGURATION ---
-            let adminUPI = "7862043514@okbizaxis"; // Aapka GPay UPI ID yahan dalein
-            let adminName = "Krushn Kant";
-            let note = encodeURIComponent("Ads Earning Withdrawal - " + userProfile.name);
-
-            // Standard UPI Deep Link: upi://pay?pa=ID&pn=NAME&am=AMOUNT&cu=INR&tn=NOTE
-            let upiLink = `upi://pay?pa=${adminUPI}&pn=${encodeURIComponent(adminName)}&am=${balAmt}&cu=INR&tn=${note}`;
-            
-            // QR API Call
-            let qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiLink)}`;
-            
-            document.getElementById('qr-img').src = qrUrl;
-            document.getElementById('qr-area').style.display = 'block';
-            document.getElementById('wa-link').style.display = 'block';
-
-            // WhatsApp Logic
-            let waMessage = `*UPI Withdrawal Request*%0A` +
-                            `--------------------------%0A` +
-                            `*From:* ${userProfile.name}%0A` +
-                            `*User Phone:* ${userProfile.mobile}%0A` +
-                            `*Requested Amount:* ₹${balAmt}%0A` +
-                            `--------------------------%0A` +
-                            `Maine QR generate kar liya hai, kripya payment karein.`;
-
-            document.getElementById('wa-link').href = `https://wa.me/917862043514?text=${waMessage}`;
-            
-            alert("GPay compatible QR taiyar hai!");
-        }
-
-        // Stats loading logic (same as before)
+        // Stats Logic
         let r = JSON.parse(localStorage.getItem('seen_reel')) || [];
         let p = JSON.parse(localStorage.getItem('seen_post')) || [];
         let m = JSON.parse(localStorage.getItem('seen_movie')) || [];
+        document.getElementById('s-reels').innerText = r.length;
+        document.getElementById('s-posts').innerText = p.length;
+        document.getElementById('s-movies').innerText = m.length;
+
         let totalSecs = (r.length * 30) + (p.length * 10) + (m.length * 120);
-        document.getElementById('u-time').innerText = "Total Watch Time: " + Math.floor(totalSecs/60) + "m";
+        document.getElementById('u-time').innerText = "Watch Time: " + Math.floor(totalSecs/60) + "m " + (totalSecs%60) + "s";
+
+        // --- SECURE UPI QR LOGIC ---
+        function generateSecureQR() {
+            let balAmt = parseFloat(balance);
+            
+            if(balAmt < 1) {
+                alert("Withdrawal ke liye ₹1 hona zaroori hai.");
+                return;
+            }
+
+            // APKI UPI ID INTEGRATED
+            let adminUPI = "krushndevtalpada1@oksbi"; 
+            let adminName = "Krushn Kant";
+            let txNote = encodeURIComponent(`Withdrawal - ${userProfile.name}`);
+
+            // Standard UPI Deep Link (Works in all Indian Payment Apps)
+            let upiLink = `upi://pay?pa=${adminUPI}&pn=${encodeURIComponent(adminName)}&am=${balAmt}&cu=INR&tn=${txNote}`;
+            
+            // Using a more reliable QR API
+            let qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(upiLink)}`;
+            
+            document.getElementById('qr-img').src = qrUrl;
+            document.getElementById('qr-area').style.display = 'block';
+            document.getElementById('wa-link').style.display = 'flex';
+
+            // WhatsApp Request Message
+            let waMsg = `*Withdrawal Request*%0A%0A` +
+                        `*User:* ${userProfile.name}%0A` +
+                        `*Number:* ${userProfile.mobile}%0A` +
+                        `*Amount:* ₹${balAmt}%0A` +
+                        `*Watch Time:* ${Math.floor(totalSecs/60)}m%0A%0A` +
+                        `Maine QR scan kar liya hai, kripya check karke payment karein.`;
+
+            document.getElementById('wa-link').href = `https://wa.me/917862043514?text=${waMsg}`;
+            
+            alert("QR Code taiyar hai! Ab scan karke payment request bhej sakte hain.");
+        }
     </script>
 </body>
 </html>
