@@ -3,131 +3,151 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Withdrawal - Krishna Ads</title>
+    <title>Wallet - Krishna Ads</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         body { background: #f4f7f6; font-family: 'Segoe UI', sans-serif; margin: 0; padding-bottom: 80px; }
         header { background: #fff; padding: 15px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .container { max-width: 450px; margin: auto; padding: 15px; }
 
-        /* Balance Card */
         .balance-card {
             background: linear-gradient(135deg, #28a745, #1e7e34); color: white;
             padding: 30px; border-radius: 20px; text-align: center; margin-bottom: 20px;
         }
         .balance-amount { font-size: 40px; font-weight: bold; }
 
-        /* Withdrawal Form */
         .withdraw-form { background: #fff; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        
+        .method-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tab { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 8px; cursor: pointer; text-align: center; font-size: 14px; font-weight: bold; transition: 0.3s; }
+        .tab.active { background: #28a745; color: white; border-color: #28a745; }
+
         .input-group { margin-bottom: 15px; text-align: left; }
         label { font-size: 13px; font-weight: bold; color: #555; }
-        input, select { 
-            width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ddd; 
-            border-radius: 8px; box-sizing: border-box; font-size: 15px;
-        }
+        input { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 15px; }
+
+        #qr-preview-box { display: none; text-align: center; margin: 15px 0; padding: 10px; border: 2px dashed #28a745; border-radius: 10px; background: #f9f9f9; }
+        #qr-preview-box img { width: 180px; height: 180px; margin-top: 10px; }
 
         .submit-btn {
             width: 100%; background: #25D366; color: white; border: none;
             padding: 15px; border-radius: 10px; font-size: 16px; font-weight: bold;
             cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
         }
-        .submit-btn:hover { background: #128C7E; }
 
-        .footer-nav { 
-            position: fixed; bottom: 0; width: 100%; background: #fff; 
-            display: flex; justify-content: space-around; padding: 12px 0; 
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.1); 
-        }
+        .footer-nav { position: fixed; bottom: 0; width: 100%; background: #fff; display: flex; justify-content: space-around; padding: 12px 0; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); }
         .footer-nav a { text-decoration: none; color: #888; font-size: 11px; text-align: center; }
-        .active { color: #28a745 !important; }
+        .active-nav { color: #28a745 !important; }
     </style>
 </head>
 <body>
 
     <header>
-        <h2 style="margin:0; color:#28a745;">Wallet</h2>
+        <h2 style="margin:0; color:#28a745;">My Wallet</h2>
     </header>
 
     <div class="container">
         <div class="balance-card">
-            <span>Your Earning</span>
+            <span>Available Balance</span>
             <div class="balance-amount">₹<span id="bal-val">0.00</span></div>
             <p style="font-size:12px; opacity:0.8;">Min. Withdrawal: ₹1</p>
         </div>
 
         <div class="withdraw-form">
-            <h3 style="margin-top:0; color:#333;">Withdraw Details</h3>
+            <h3 style="margin:0 0 15px 0; color:#333; text-align:center;">Withdraw Details</h3>
             
-            <div class="input-group">
-                <label>Payment Method</label>
-                <select id="pay-method">
-                    <option value="Google Pay">Google Pay (GPay)</option>
-                    <option value="PhonePe">PhonePe</option>
-                    <option value="Paytm">Paytm</option>
-                    <option value="UPI ID">Direct UPI ID</option>
-                </select>
+            <div class="method-tabs">
+                <div class="tab active" id="tab-upi" onclick="switchTab('UPI')">UPI ID</div>
+                <div class="tab" id="tab-phone" onclick="switchTab('PHONE')">Phone Number</div>
             </div>
 
-            <div class="input-group">
-                <label>Phone Number / UPI ID</label>
-                <input type="text" id="pay-number" placeholder="e.g. 7862043514">
+            <div class="input-group" id="upi-input">
+                <label>Enter UPI ID</label>
+                <input type="text" id="user-upi" placeholder="example@oksbi">
             </div>
 
-            <button class="submit-btn" onclick="sendWithdrawRequest()">
-                <i class="fab fa-whatsapp"></i> Withdraw via WhatsApp
+            <div class="input-group" id="phone-input" style="display:none;">
+                <label>Enter Phone (GPay/PhonePe)</label>
+                <input type="number" id="user-phone" placeholder="9876543210">
+                <p style="font-size:10px; color:gray; margin-top:5px;">*Auto-converts to GPay UPI ID</p>
+            </div>
+
+            <div id="qr-preview-box">
+                <p style="font-size: 11px; font-weight: bold; color: #28a745;">Real-Time QR Ready!</p>
+                <img id="generated-qr" src="" alt="Payment QR">
+                <p style="font-size: 10px; color: #666; margin-top:5px;">Admin can scan this via GPay</p>
+            </div>
+
+            <button class="submit-btn" onclick="generateRequest()">
+                <i class="fab fa-whatsapp"></i> Generate & Send QR
             </button>
-            <p style="font-size:11px; color:#999; text-align:center; margin-top:10px;">
-                Request bhejte hi Admin aapko pay kar denge.
-            </p>
         </div>
     </div>
 
     <div class="footer-nav">
         <a href="home.html"><i class="fas fa-home"></i><br>Home</a>
-        <a href="earning.html" class="active"><i class="fas fa-wallet"></i><br>Wallet</a>
+        <a href="earning.html" class="active-nav"><i class="fas fa-wallet"></i><br>Wallet</a>
         <a href="profile.html"><i class="fas fa-user"></i><br>Profile</a>
     </div>
 
     <script>
+        let currentMethod = 'UPI';
+
+        // Load Balance
         function getCookie(n) {
             let b = document.cookie.match('(^|;)\\s*' + n + '\\s*=\\s*([^;]+)');
             return b ? b.pop() : "0.00";
         }
-
         const balance = getCookie("balance");
         const user = JSON.parse(decodeURIComponent(getCookie("user_profile") || "{}"));
         document.getElementById('bal-val').innerText = balance;
 
-        function sendWithdrawRequest() {
-            let method = document.getElementById('pay-method').value;
-            let number = document.getElementById('pay-number').value.trim();
+        function switchTab(method) {
+            currentMethod = method;
+            document.getElementById('tab-upi').classList.toggle('active', method === 'UPI');
+            document.getElementById('tab-phone').classList.toggle('active', method === 'PHONE');
+            document.getElementById('upi-input').style.display = method === 'UPI' ? 'block' : 'none';
+            document.getElementById('phone-input').style.display = method === 'PHONE' ? 'block' : 'none';
+        }
+
+        function generateRequest() {
             let amount = parseFloat(balance);
+            let finalUpi = "";
 
-            if(amount < 1) {
-                alert("Withdrawal ke liye kam se kam ₹1 hona chahiye.");
-                return;
+            if(amount < 1) return alert("Balance ₹1 se kam hai!");
+
+            if(currentMethod === 'UPI') {
+                finalUpi = document.getElementById('user-upi').value.trim();
+                if(!finalUpi.includes('@')) return alert("Sahi UPI ID dalein!");
+            } else {
+                let phone = document.getElementById('user-phone').value.trim();
+                if(phone.length !== 10) return alert("10-digit phone number dalein!");
+                finalUpi = `${phone}@okaxis`; // Default GPay handle
             }
 
-            if(number.length < 5) {
-                alert("Kripya sahi number ya UPI ID dalein.");
-                return;
-            }
-
-            // WhatsApp Message Format
-            let msg = `*NEW WITHDRAWAL REQUEST*%0A` +
-                      `----------------------------%0A` +
-                      `*User Name:* ${user.name || 'Unknown'}%0A` +
-                      `*Earning Amount:* ₹${amount}%0A` +
-                      `*Payment App:* ${method}%0A` +
-                      `*Payment Number:* ${number}%0A` +
-                      `----------------------------%0A` +
-                      `Admin, kripya mera payment process karein.`;
-
-            // Admin Number: 7862043514
-            let waUrl = `https://wa.me/917862043514?text=${msg}`;
+            // Real UPI Payment Link
+            let paymentData = `upi://pay?pa=${finalUpi}&pn=${encodeURIComponent(user.name)}&am=${amount}&cu=INR&tn=KrishnaAds_Withdraw`;
             
-            // Redirect to WhatsApp
-            window.location.href = waUrl;
+            // Third Party QR API
+            let qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(paymentData)}`;
+            
+            document.getElementById('generated-qr').src = qrUrl;
+            document.getElementById('qr-preview-box').style.display = 'block';
+
+            // WhatsApp Logic
+            let msg = `*💸 WITHDRAWAL REQUEST*%0A` +
+                      `----------------------------%0A` +
+                      `*Name:* ${user.name}%0A` +
+                      `*Amount:* ₹${amount}%0A` +
+                      `*Pay via:* ${currentMethod}%0A` +
+                      `*UPI ID:* ${finalUpi}%0A` +
+                      `*QR Link:* ${qrUrl}%0A` +
+                      `----------------------------%0A` +
+                      `Admin, please scan QR link above via GPay to pay me.`;
+
+            setTimeout(() => {
+                window.location.href = `https://wa.me/917862043514?text=${msg}`;
+            }, 1500);
         }
     </script>
 </body>
