@@ -2,175 +2,188 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Krishna Ads - Full Screen Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Krishna Ads - Premium Dashboard</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
-        /* Ad Overlay - Full Screen Setup */
+        /* Modern UI Styles */
+        body { background-color: #f0f2f5; margin: 0; padding-bottom: 60px; }
+        
+        /* Interactive Feedback Ticker */
+        #ticker-container {
+            background: #1a1a1a; color: #00ff00; padding: 10px;
+            overflow: hidden; white-space: nowrap; font-size: 14px;
+            border-bottom: 2px solid #28a745;
+        }
+        #ticker-text { display: inline-block; animation: scrollText 25s linear infinite; }
+        @keyframes scrollText {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+
+        /* Ad Overlay */
         #ad-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; z-index: 2000; flex-direction: column;
+            background: #000; z-index: 9999; flex-direction: column; align-items: center; justify-content: center;
         }
-
         .timer-display { 
-            position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
-            font-size: 35px; color: #00ff00; font-weight: bold; z-index: 2005;
-            text-shadow: 2px 2px 10px rgba(0,0,0,0.8);
-            background: rgba(0,0,0,0.5); padding: 5px 20px; border-radius: 30px;
+            position: absolute; top: 20px; font-size: 26px; color: #fff;
+            background: rgba(40, 167, 69, 0.8); padding: 8px 25px; border-radius: 50px;
+            font-weight: bold; z-index: 10000;
         }
 
-        .video-container { width: 100%; height: 100%; position: relative; }
+        /* Responsive Container */
+        .container { max-width: 800px; margin: auto; padding: 20px; display: grid; grid-template-columns: 1fr; gap: 15px; }
+        @media(min-width: 600px) { .container { grid-template-columns: 1fr 1fr 1fr; } }
 
-        /* Full Size Media */
-        iframe, img { 
-            width: 100% !important; height: 100% !important; 
-            border: none; object-fit: cover; /* Cover se full screen fill hoga */
+        /* Fancy Ad Cards */
+        .ad-box {
+            background: #fff; border-radius: 15px; padding: 25px; text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); cursor: pointer; transition: 0.3s;
+            border-bottom: 4px solid #28a745;
         }
+        .ad-box:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
+        .ad-box h3 { margin: 10px 0; color: #333; }
+        .ad-box p { color: #28a745; font-weight: bold; margin: 5px 0; }
 
-        .video-blocker { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2002; background: rgba(0,0,0,0); }
+        /* Stats Bar */
+        .stats-bar { background: #fff; margin: 15px 20px; padding: 15px; border-radius: 10px; display: flex; justify-content: space-around; font-size: 13px; text-align: center; }
+        
+        /* Footer */
+        footer { background: #333; color: white; padding: 30px 20px; text-align: center; margin-top: 50px; }
+        .footer-links a { color: #00ff00; text-decoration: none; margin: 0 10px; font-size: 14px; }
+        
+        .media-fit { max-width: 100%; max-height: 100%; object-fit: contain; }
 
-        /* Loading Spinner */
-        #loading-msg {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            color: white; font-size: 20px; z-index: 2001;
-        }
-
-        /* Dashboard UI */
-        .container { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; padding: 40px 20px; }
-        .ad-box { 
-            background: #fff; padding: 25px; width: 260px; border-radius: 15px; text-align: center; 
-            cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-top: 5px solid #28a745;
-        }
-        .profile-btn {
-            position: fixed; bottom: 25px; right: 25px; background: #28a745;
-            color: white; width: 60px; height: 60px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            text-decoration: none; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 100;
-        }
+        /* Floating Button */
+        .float-profile { position: fixed; bottom: 20px; right: 20px; background: #28a745; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; text-decoration: none; font-weight: bold; box-shadow: 0 5px 15px rgba(0,0,0,0.3); z-index: 100; }
     </style>
 </head>
 <body>
 
-    <header>
-        <h1>Krishna Advertisement</h1>
-        <nav><a href="home.html">Home</a> | <a href="earning.html">Earning</a> | <a href="profile.html">Profile</a></nav>
+    <div id="ticker-container">
+        <div id="ticker-text">Welcome Krushn Kant! • New Member joined: Aryan • Top Earner: ₹150.00 today • Support WhatsApp: +91 0000000000 • Please send your feedback from Profile page!</div>
+    </div>
+
+    <header style="background: #fff; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+        <h2 style="margin:0; color: #28a745;">Krishna Ads</h2>
+        <div style="font-size: 14px; font-weight: bold;">Wallet: ₹<span id="nav-bal" style="color:#28a745;">0.00</span></div>
     </header>
+
+    <div class="stats-bar">
+        <div><b id="stat-reels">0</b><br>Reels</div>
+        <div><b id="stat-posts">0</b><br>Posts</div>
+        <div><b id="stat-movies">0</b><br>Movies</div>
+    </div>
 
     <div class="container">
         <div class="ad-box" onclick="startTask('reel')">
-            <h3>Watch Full Reels</h3>
-            <p>Earn ₹0.10 | 30s</p>
+            <img src="https://cdn-icons-png.flaticon.com/512/9326/9326463.png" width="50">
+            <h3>Watch Reels</h3>
+            <p>Earn ₹0.10</p>
         </div>
         <div class="ad-box" onclick="startTask('post')">
-            <h3>View Full Posts</h3>
-            <p>Earn ₹0.06 | 10s</p>
+            <img src="https://cdn-icons-png.flaticon.com/512/1160/1160358.png" width="50">
+            <h3>Daily Posts</h3>
+            <p>Earn ₹0.06</p>
         </div>
         <div class="ad-box" onclick="startTask('movie')">
-            <h3>Short Movie Ad</h3>
-            <p>Earn ₹0.50 | 2m</p>
+            <img src="https://cdn-icons-png.flaticon.com/512/4221/4221419.png" width="50">
+            <h3>Short Movies</h3>
+            <p>Earn ₹0.50</p>
         </div>
     </div>
+
+    <footer>
+        <div class="footer-links">
+            <a href="home.html">Home</a> | 
+            <a href="earning.html">Withdraw</a> | 
+            <a href="profile.html">My Stats</a>
+        </div>
+        <p style="font-size: 12px; margin-top: 15px; color: #bbb;">Contact: support@krishnaads.com<br>WhatsApp Support: +91 XXXXXXXXXX</p>
+        <p style="font-size: 10px; color: #777;">&copy; 2026 Krishna Advertisement. All Rights Reserved.</p>
+    </footer>
 
     <div id="ad-overlay">
-        <div id="loading-msg">Loading Media... Please wait</div>
-        <div id="timer-box" class="timer-display" style="display:none;">Wait: <span id="countdown">0</span>s</div>
-        
-        <div class="video-container">
-            <div id="blocker-layer" class="video-blocker"></div>
-            <div id="media-content" style="width:100%; height:100%;"></div>
-        </div>
+        <div id="load-info" style="color:white;">Loading Content...</div>
+        <div id="time-box" class="timer-display" style="display:none;">Wait: <span id="countdown">0</span>s</div>
+        <div id="media-wrap" style="width:100%; height:100%; display:flex; justify-content:center; align-items:center;"></div>
+        <div style="position:absolute; bottom:20px; color:#555; font-size:12px;">Security: Task cannot be skipped</div>
     </div>
 
-    <a href="profile.html" class="profile-btn">Profile</a>
+    <a href="profile.html" class="float-profile">Profile</a>
 
     <script>
-        // --- DATA ---
         const postDatabase = [
-            "1b0536ece6d7c04180ec9bfbc772d2e1.jpg", 
-            "221147ea2778af9c1e6c82761e47d01c.jpg", 
-            "580fba1deafcf017acd880984461296a.jpg", 
-            "787756e0bf5c8282e44ef4471a2874dc.jpg",
-            "IMG-20260307-WA0003.jpg", 
-            "InShot_20260311_082602526.jpg", 
-            "InShot_20260413_213048735.jpg"
+            "1b0536ece6d7c04180ec9bfbc772d2e1.jpg", "221147ea2778af9c1e6c82761e47d01c.jpg", 
+            "580fba1deafcf017acd880984461296a.jpg", "787756e0bf5c8282e44ef4471a2874dc.jpg",
+            "IMG-20260307-WA0003.jpg", "InShot_20260311_082602526.jpg", "InShot_20260413_213048735.jpg"
         ];
 
-        let countdownInterval;
+        let countdown;
+
+        window.onload = () => {
+            document.getElementById('nav-bal').innerText = getCookie("balance");
+            updateStats();
+            loadFeedbacks();
+        };
+
+        function updateStats() {
+            document.getElementById('stat-reels').innerText = (JSON.parse(localStorage.getItem('seen_reel')) || []).length;
+            document.getElementById('stat-posts').innerText = (JSON.parse(localStorage.getItem('seen_post')) || []).length;
+            document.getElementById('stat-movies').innerText = (JSON.parse(localStorage.getItem('seen_movie')) || []).length;
+        }
+
+        function loadFeedbacks() {
+            let feeds = JSON.parse(localStorage.getItem('admin_feeds')) || [];
+            if(feeds.length > 0) {
+                let text = feeds.map(f => `★ ${f.user}: ${f.text}`).join("    |    ");
+                document.getElementById('ticker-text').innerText = text;
+            }
+        }
 
         async function startTask(type) {
+            document.getElementById('ad-overlay').style.display = 'flex';
+            document.getElementById('load-info').style.display = 'block';
+            document.getElementById('time-box').style.display = 'none';
+            
             let selectedId = "";
             let duration = 0;
 
             try {
-                document.getElementById('ad-overlay').style.display = 'flex';
-                document.getElementById('loading-msg').style.display = 'block';
-                document.getElementById('timer-box').style.display = 'none';
-                document.getElementById('media-content').innerHTML = "";
-
-                if (type === 'post') {
+                if(type === 'post') {
                     let seen = JSON.parse(localStorage.getItem('seen_post')) || [];
-                    let available = postDatabase.filter(img => !seen.includes(img));
-                    if(available.length === 0) {
-                        closeOverlay();
-                        return alert("Sari posts dekh li hain!");
-                    }
-                    selectedId = available[Math.floor(Math.random() * available.length)];
+                    let available = postDatabase.filter(i => !seen.includes(i));
+                    if(available.length === 0) { hideAd(); return alert("No more posts!"); }
+                    selectedId = available[Math.floor(Math.random()*available.length)];
                     duration = 10;
-                    loadMedia(type, selectedId, duration);
+                    renderMedia(`<img src="upload-add/post/${selectedId}" class="media-fit" onload="runTimer(${duration},'${type}','${selectedId}')">`);
                 } else {
-                    const fileName = (type === 'reel') ? 'reels.txt' : 'movie.txt';
-                    const response = await fetch(fileName);
-                    const text = await response.text();
-                    const allIds = text.split('\n').map(id => id.trim()).filter(id => id !== "");
-                    
+                    const res = await fetch(type === 'reel' ? 'reels.txt' : 'movie.txt');
+                    const text = await res.text();
+                    const ids = text.split('\n').map(s=>s.trim()).filter(s=>s!=="");
                     let seen = JSON.parse(localStorage.getItem(`seen_${type}`)) || [];
-                    let available = allIds.filter(id => !seen.includes(id));
-
-                    if(available.length === 0) {
-                        closeOverlay();
-                        return alert(`Saari ${type}s dekh li hain!`);
-                    }
-                    
-                    selectedId = available[Math.floor(Math.random() * available.length)];
-                    duration = (type === 'reel') ? 30 : 120;
-                    loadMedia(type, selectedId, duration);
+                    let available = ids.filter(i => !seen.includes(i));
+                    if(available.length === 0) { hideAd(); return alert(`All ${type}s done!`); }
+                    selectedId = available[Math.floor(Math.random()*available.length)];
+                    duration = type === 'reel' ? 30 : 120;
+                    renderMedia(`<iframe src="https://www.youtube.com/embed/${selectedId}?autoplay=1&mute=1&controls=0&rel=0" class="media-fit" style="width:100vw; height:56.25vw; max-height:100vh;" onload="runTimer(${duration},'${type}','${selectedId}')" frameborder="0" allow="autoplay"></iframe>`);
                 }
-            } catch (err) {
-                alert("Error loading files. Check GitHub.");
-                closeOverlay();
-            }
+            } catch(e) { hideAd(); alert("Connection Error!"); }
         }
 
-        function loadMedia(type, id, dur) {
-            const content = document.getElementById('media-content');
-            let mediaHtml = "";
+        function renderMedia(html) { document.getElementById('media-wrap').innerHTML = html; }
 
-            if (type === 'post') {
-                mediaHtml = `<img src="upload-add/post/${id}" onload="startTimer(${dur}, '${type}', '${id}')" onerror="alert('Image error')">`;
-            } else {
-                // YouTube with Event Listener (Muted autoplay for full loading)
-                mediaHtml = `<iframe id="yt-player" src="https://www.youtube.com/embed/${id}?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0" 
-                             onload="startTimer(${dur}, '${type}', '${id}')" frameborder="0" allow="autoplay"></iframe>`;
-            }
-            content.innerHTML = mediaHtml;
-        }
-
-        function startTimer(seconds, type, id) {
-            // Hide loading, show timer
-            document.getElementById('loading-msg').style.display = 'none';
-            document.getElementById('timer-box').style.display = 'block';
-            
-            let timeLeft = seconds;
-            document.getElementById('countdown').innerText = timeLeft;
-
-            clearInterval(countdownInterval);
-            countdownInterval = setInterval(() => {
-                timeLeft--;
-                document.getElementById('countdown').innerText = timeLeft;
-                if (timeLeft <= 0) {
-                    clearInterval(countdownInterval);
-                    finishTask(type, id);
-                }
+        function runTimer(sec, type, id) {
+            document.getElementById('load-info').style.display = 'none';
+            document.getElementById('time-box').style.display = 'block';
+            let left = sec;
+            document.getElementById('countdown').innerText = left;
+            clearInterval(countdown);
+            countdown = setInterval(() => {
+                left--;
+                document.getElementById('countdown').innerText = left;
+                if(left <= 0) { clearInterval(countdown); finishTask(type, id); }
             }, 1000);
         }
 
@@ -178,27 +191,15 @@
             let seen = JSON.parse(localStorage.getItem(`seen_${type}`)) || [];
             seen.push(id);
             localStorage.setItem(`seen_${type}`, JSON.stringify(seen));
-
-            let reward = (type === 'reel') ? 0.10 : (type === 'post' ? 0.06 : 0.50);
-            let currentBal = parseFloat(getCookie("balance")) || 0;
-            setCookie("balance", (currentBal + reward).toFixed(2));
-
-            alert(`Task Complete! ₹${reward} added.`);
-            window.location.href = "earning.html";
+            let r = type === 'reel' ? 0.10 : (type === 'post' ? 0.06 : 0.50);
+            setCookie("balance", (parseFloat(getCookie("balance")) + r).toFixed(2));
+            alert("Reward Earned: ₹" + r);
+            window.location.reload();
         }
 
-        function closeOverlay() {
-            document.getElementById('ad-overlay').style.display = 'none';
-        }
-
-        function setCookie(n, v) {
-            const d = new Date(); d.setTime(d.getTime() + (365*24*60*60*1000));
-            document.cookie = `${n}=${v};expires=${d.toUTCString()};path=/`;
-        }
-        function getCookie(n) {
-            let b = document.cookie.match('(^|;)\\s*' + n + '\\s*=\\s*([^;]+)');
-            return b ? b.pop() : "0.00";
-        }
+        function hideAd() { document.getElementById('ad-overlay').style.display = 'none'; }
+        function setCookie(n, v) { document.cookie = `${n}=${v};expires=${new Date(Date.now()+31536000000).toUTCString()};path=/`; }
+        function getCookie(n) { let b = document.cookie.match('(^|;)\\s*'+n+'\\s*=\\s*([^;]+)'); return b ? b.pop() : "0.00"; }
     </script>
 </body>
     </html>
