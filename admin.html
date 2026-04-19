@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Portal - Krishna Ads</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { background: #f0f2f5; font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .auth-card { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 350px; text-align: center; }
+        h2 { color: #28a745; margin-bottom: 20px; }
+        .input-group { margin-bottom: 15px; text-align: left; }
+        label { font-size: 12px; font-weight: bold; color: #666; }
+        input { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        .btn { width: 100%; background: #28a745; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .toggle-link { margin-top: 15px; font-size: 13px; color: #007bff; cursor: pointer; display: block; }
+    </style>
+</head>
+<body>
+
+    <div class="auth-card" id="login-box">
+        <h2>Admin Login</h2>
+        <div class="input-group">
+            <label>Admin Email</label>
+            <input type="email" id="l-email" placeholder="admin@example.com">
+        </div>
+        <div class="input-group">
+            <label>Password</label>
+            <input type="password" id="l-pass" placeholder="••••••••">
+        </div>
+        <button class="btn" onclick="loginAdmin()">Login to Dashboard</button>
+        <span class="toggle-link" onclick="toggleAuth()">Create Admin Account (One Time)</span>
+    </div>
+
+    <div class="auth-card" id="signup-box" style="display:none;">
+        <h2>Admin Signup</h2>
+        <div class="input-group">
+            <label>Set Admin Email</label>
+            <input type="email" id="s-email" placeholder="admin@krishna.com">
+        </div>
+        <div class="input-group">
+            <label>Set Secure Password</label>
+            <input type="password" id="s-pass" placeholder="Create Password">
+        </div>
+        <button class="btn" style="background: #333;" onclick="signupAdmin()">Register Admin</button>
+        <span class="toggle-link" onclick="toggleAuth()">Back to Login</span>
+    </div>
+
+    <script>
+        // --- TOGGLE BETWEEN LOGIN & SIGNUP ---
+        function toggleAuth() {
+            const lBox = document.getElementById('login-box');
+            const sBox = document.getElementById('signup-box');
+            if(lBox.style.display === "none") {
+                lBox.style.display = "block";
+                sBox.style.display = "none";
+            } else {
+                lBox.style.display = "none";
+                sBox.style.display = "block";
+            }
+        }
+
+        // --- SIGNUP LOGIC (One Time Use) ---
+        function signupAdmin() {
+            const email = document.getElementById('s-email').value;
+            const pass = document.getElementById('s-pass').value;
+
+            if(!email || !pass) return alert("Fields cannot be empty!");
+
+            const adminData = { email: email, pass: pass };
+            localStorage.setItem('krishna_admin_credentials', JSON.stringify(adminData));
+            
+            alert("Admin Registered! Now delete the signup code and Login.");
+            toggleAuth();
+        }
+
+        // --- LOGIN LOGIC ---
+        function loginAdmin() {
+            const email = document.getElementById('l-email').value;
+            const pass = document.getElementById('l-pass').value;
+
+            const storedData = JSON.parse(localStorage.getItem('krishna_admin_credentials'));
+
+            if(!storedData) {
+                alert("No Admin found! Please use signup first.");
+                return;
+            }
+
+            if(email === storedData.email && pass === storedData.pass) {
+                alert("Login Successful! Redirecting...");
+                sessionStorage.setItem('isAdminLoggedIn', 'true');
+                window.location.href = 'admin.html'; // Aapka Admin Dashboard Page
+            } else {
+                alert("Invalid Email or Password!");
+            }
+        }
+    </script>
+</body>
+</html>
