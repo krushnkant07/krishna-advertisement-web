@@ -16,24 +16,23 @@
         }
         .balance-amount { font-size: 40px; font-weight: bold; }
 
-        .withdraw-form { background: #fff; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .withdraw-form, .history-card { background: #fff; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 20px; }
         
-        .method-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
-        .tab { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 8px; cursor: pointer; text-align: center; font-size: 14px; font-weight: bold; transition: 0.3s; }
-        .tab.active { background: #28a745; color: white; border-color: #28a745; }
-
         .input-group { margin-bottom: 15px; text-align: left; }
         label { font-size: 13px; font-weight: bold; color: #555; }
-        input, select { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 15px; outline: none; }
+        input { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 15px; outline: none; }
 
         #qr-preview-box { display: none; text-align: center; margin: 15px 0; padding: 10px; border: 2px dashed #28a745; border-radius: 10px; background: #f9f9f9; }
-        #qr-preview-box img { width: 180px; height: 180px; margin-top: 10px; }
+        #qr-preview-box img { width: 180px; height: 180px; margin-top: 10px; border: 4px solid #fff; }
 
-        .submit-btn {
-            width: 100%; background: #25D366; color: white; border: none;
-            padding: 15px; border-radius: 10px; font-size: 16px; font-weight: bold;
-            cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
-        }
+        .btn { width: 100%; border: none; padding: 15px; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .gen-btn { background: #007bff; color: white; }
+        .wa-btn { background: #25D366; color: white; display: none; }
+        
+        /* History Styles */
+        .history-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; }
+        .history-item:last-child { border-bottom: none; }
+        .status-pending { color: #f39c12; font-size: 12px; font-weight: bold; }
 
         .footer-nav { position: fixed; bottom: 0; width: 100%; background: #fff; display: flex; justify-content: space-around; padding: 12px 0; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); }
         .footer-nav a { text-decoration: none; color: #888; font-size: 11px; text-align: center; }
@@ -54,41 +53,33 @@
         </div>
 
         <div class="withdraw-form">
-            <h3 style="margin:0 0 15px 0; color:#333; text-align:center;">Withdraw Details</h3>
+            <h3 style="margin:0 0 15px 0; color:#333; text-align:center;">Request Payment</h3>
             
-            <div class="method-tabs">
-                <div class="tab active" id="tab-upi" onclick="switchTab('UPI')">UPI ID</div>
-                <div class="tab" id="tab-phone" onclick="switchTab('PHONE')">Phone Number</div>
-            </div>
-
-            <div class="input-group" id="upi-input">
+            <div class="input-group">
                 <label>Enter Full UPI ID</label>
                 <input type="text" id="user-upi" placeholder="example@oksbi">
             </div>
 
-            <div class="input-group" id="phone-input" style="display:none;">
-                <label>Phone Number</label>
-                <input type="number" id="user-phone" placeholder="9876543210">
-                
-                <label style="margin-top:10px; display:block;">Select Bank App Handle</label>
-                <select id="user-handle">
-                    <option value="@oksbi">GPay (SBI)</option>
-                    <option value="@okaxis">GPay (Axis)</option>
-                    <option value="@okicici">GPay (ICICI)</option>
-                    <option value="@ybl">PhonePe</option>
-                    <option value="@paytm">Paytm</option>
-                </select>
-            </div>
-
             <div id="qr-preview-box">
-                <p style="font-size: 11px; font-weight: bold; color: #28a745;">Verified QR Generated!</p>
+                <p style="font-size: 11px; font-weight: bold; color: #28a745;">Payment QR Generated!</p>
                 <img id="generated-qr" src="" alt="Payment QR">
-                <p style="font-size: 10px; color: #666; margin-top:5px;">Admin: Scan via GPay to see Bank Name</p>
+                <p style="font-size: 10px; color: #666; margin-top:5px;">Check details before sending</p>
             </div>
 
-            <button class="submit-btn" onclick="generateRequest()">
-                <i class="fab fa-whatsapp"></i> Generate & Send QR
+            <button id="btn-gen" class="btn gen-btn" onclick="generateQR()">
+                <i class="fas fa-qrcode"></i> Generate Payment QR
             </button>
+
+            <button id="btn-wa" class="btn wa-btn" onclick="sendToWhatsApp()">
+                <i class="fab fa-whatsapp"></i> Send QR to Admin
+            </button>
+        </div>
+
+        <div class="history-card">
+            <h4 style="margin:0 0 10px 0; color:#555;"><i class="fas fa-history"></i> Recent History</h4>
+            <div id="history-list">
+                <p style="font-size: 12px; color: #999; text-align: center;">No history yet</p>
+            </div>
         </div>
     </div>
 
@@ -99,62 +90,85 @@
     </div>
 
     <script>
-        let currentMethod = 'UPI';
+        let tempQR = "";
+        let tempAmt = 0;
+        let tempUPI = "";
 
+        // Cookies management
         function getCookie(n) {
             let b = document.cookie.match('(^|;)\\s*' + n + '\\s*=\\s*([^;]+)');
             return b ? b.pop() : "0.00";
         }
-        const balance = getCookie("balance");
-        const user = JSON.parse(decodeURIComponent(getCookie("user_profile") || "{}"));
-        document.getElementById('bal-val').innerText = balance;
-
-        function switchTab(method) {
-            currentMethod = method;
-            document.getElementById('tab-upi').classList.toggle('active', method === 'UPI');
-            document.getElementById('tab-phone').classList.toggle('active', method === 'PHONE');
-            document.getElementById('upi-input').style.display = method === 'UPI' ? 'block' : 'none';
-            document.getElementById('phone-input').style.display = method === 'PHONE' ? 'block' : 'none';
+        function setCookie(n, v) {
+            document.cookie = n + "=" + v + ";path=/;max-age=" + (365*24*60*60);
         }
 
-        function generateRequest() {
-            let amount = parseFloat(balance);
-            let finalUpi = "";
+        // Initial Load
+        let balance = parseFloat(getCookie("balance"));
+        const user = JSON.parse(decodeURIComponent(getCookie("user_profile") || "{}"));
+        document.getElementById('bal-val').innerText = balance.toFixed(2);
+        loadHistory();
 
-            if(amount < 1) return alert("Balance ₹1 se kam hai!");
+        function generateQR() {
+            let upi = document.getElementById('user-upi').value.trim();
+            if(balance < 1) return alert("Balance ₹1 se kam hai!");
+            if(!upi.includes('@')) return alert("Valid UPI ID dalein!");
 
-            if(currentMethod === 'UPI') {
-                finalUpi = document.getElementById('user-upi').value.trim();
-                if(!finalUpi.includes('@')) return alert("Sahi UPI ID dalein!");
-            } else {
-                let phone = document.getElementById('user-phone').value.trim();
-                let handle = document.getElementById('user-handle').value;
-                if(phone.length !== 10) return alert("10-digit number dalein!");
-                finalUpi = `${phone}${handle}`;
-            }
+            tempAmt = balance;
+            tempUPI = upi;
 
-            // Real UPI Intent URL
-            // Adding 'mc' and 'tid' parameters can help some apps recognize verified IDs
-            let paymentData = `upi://pay?pa=${finalUpi}&pn=${encodeURIComponent(user.name)}&am=${amount}&cu=INR&tn=KrishnaAds_Payment`;
+            // UPI Payment String
+            let paymentData = `upi://pay?pa=${upi}&pn=${encodeURIComponent(user.name)}&am=${balance}&cu=INR&tn=Earning_Withdrawal`;
+            tempQR = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(paymentData)}`;
             
-            let qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(paymentData)}`;
-            
-            document.getElementById('generated-qr').src = qrUrl;
+            document.getElementById('generated-qr').src = tempQR;
             document.getElementById('qr-preview-box').style.display = 'block';
+            document.getElementById('btn-wa').style.display = 'flex';
+            document.getElementById('btn-gen').style.display = 'none';
+        }
 
+        function sendToWhatsApp() {
+            // 1. Update Wallet (Balance becomes 0)
+            setCookie("balance", "0.00");
+            document.getElementById('bal-val').innerText = "0.00";
+
+            // 2. Add to History
+            let history = JSON.parse(localStorage.getItem('payment_history') || "[]");
+            history.unshift({
+                amount: tempAmt,
+                date: new Date().toLocaleDateString(),
+                status: 'Pending'
+            });
+            localStorage.setItem('payment_history', JSON.stringify(history));
+
+            // 3. Prepare WhatsApp message
             let msg = `*💸 WITHDRAWAL REQUEST*%0A` +
                       `----------------------------%0A` +
                       `*Name:* ${user.name}%0A` +
-                      `*Amount:* ₹${amount}%0A` +
-                      `*Method:* ${currentMethod}%0A` +
-                      `*UPI ID:* ${finalUpi}%0A%0A` +
-                      `*SCAN THIS QR TO PAY:*%0A${qrUrl}%0A` +
+                      `*Amount:* ₹${tempAmt}%0A` +
+                      `*UPI ID:* ${tempUPI}%0A` +
+                      `*QR Code:* ${tempQR}%0A` +
                       `----------------------------%0A` +
-                      `Admin, scanning this QR will load the Bank Name.`;
+                      `Admin, please scan and pay.`;
 
-            setTimeout(() => {
-                window.location.href = `https://wa.me/917862043514?text=${msg}`;
-            }, 1500);
+            // 4. Redirect
+            window.location.href = `https://wa.me/917862043514?text=${msg}`;
+        }
+
+        function loadHistory() {
+            let history = JSON.parse(localStorage.getItem('payment_history') || "[]");
+            let container = document.getElementById('history-list');
+            if(history.length > 0) {
+                container.innerHTML = history.map(item => `
+                    <div class="history-item">
+                        <div>
+                            <span style="font-weight:bold;">₹${item.amount.toFixed(2)}</span><br>
+                            <small style="color:#999;">${item.date}</small>
+                        </div>
+                        <span class="status-pending">${item.status}</span>
+                    </div>
+                `).join('');
+            }
         }
     </script>
 </body>
