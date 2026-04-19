@@ -3,21 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Krishna Ads</title>
+    <title>Login - Krishna Advertisement</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <div class="auth-container">
-        <h2>Krishna Advertisement</h2>
+        <h2 style="color: #333;">Krishna Ads</h2>
+        <p style="font-size: 14px; color: #666;">Login to start earning</p>
+        
         <div id="login-box">
-            <input type="email" id="email" placeholder="Email Address">
-            <input type="password" id="pass" placeholder="Password">
-            <button onclick="login()">Login</button>
-            <button class="google-btn">Login with Google</button>
-            <p onclick="toggleAuth()">Naya account banayein (Signup)</p>
-            <p><a href="#">Forget Password?</a></p>
+            <input type="email" id="login-email" placeholder="Email Address" required>
+            
+            <input type="password" id="login-pass" placeholder="Password" required>
+            
+            <button onclick="handleLogin()" style="margin-top: 10px;">Login</button>
+            
+            <div style="margin: 15px 0; color: #999;">OR</div>
+            
+            <button class="google-btn" onclick="alert('Google Login coming soon!')">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" width="15" style="margin-right: 8px; vertical-align: middle;">
+                Login with Google
+            </button>
+            
+            <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
+            
+            <p style="font-size: 14px;">
+                Account nahi hai? 
+                <a href="signup.html" style="color: #28a745; text-decoration: none; font-weight: bold;">Naya Account Banayein</a>
+            </p>
+            
+            <p style="font-size: 13px;">
+                <a href="forget-password.html" style="color: #666;">Forget Password?</a>
+            </p>
         </div>
     </div>
-    <script src="js/script.js"></script>
+
+    <script>
+        // Cookie se data nikalne ka function
+        function getCookie(n) {
+            let b = document.cookie.match('(^|;)\\s*' + n + '\\s*=\\s*([^;]+)');
+            return b ? b.pop() : null;
+        }
+
+        function handleLogin() {
+            const emailInput = document.getElementById('login-email').value;
+            const passInput = document.getElementById('login-pass').value;
+
+            // Signup page se save kiya gaya user data check karna
+            const rawData = getCookie("user_profile");
+            
+            if (!rawData) {
+                alert("Koi account nahi mila! Pehle Signup karein.");
+                window.location.href = "signup.html";
+                return;
+            }
+
+            const userData = JSON.parse(decodeURIComponent(rawData));
+
+            // Matching Email and Password
+            if (emailInput === userData.email && passInput === userData.pass) {
+                alert("Login Successful! Welcome " + userData.name);
+                window.location.href = "home.html";
+            } else {
+                alert("Galat Email ya Password! Dubara koshish karein.");
+            }
+        }
+    </script>
 </body>
-              </html>
+    </html>
