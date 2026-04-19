@@ -4,109 +4,88 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Withdrawal - Krishna Ads</title>
-    <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { background: #f0f2f5; font-family: 'Segoe UI', sans-serif; margin: 0; padding-bottom: 80px; }
-        header { background: #fff; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        
-        .earning-container { max-width: 500px; margin: 20px auto; padding: 0 15px; }
-        
-        /* User Info Card */
-        .user-card {
-            background: #fff; padding: 20px; border-radius: 15px; margin-bottom: 20px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-left: 5px solid #28a745;
-        }
-        .user-card h2 { margin: 0; color: #333; font-size: 18px; text-transform: capitalize; }
-        .user-card p { margin: 5px 0; color: #666; font-size: 13px; }
+        body { background: #f4f7f6; font-family: 'Segoe UI', sans-serif; margin: 0; padding-bottom: 80px; }
+        header { background: #fff; padding: 15px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .container { max-width: 450px; margin: auto; padding: 15px; }
 
-        /* Stats Section */
-        .stats-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 15px; }
-        .stat-pill { background: #f8f9fa; padding: 8px; border-radius: 8px; text-align: center; border: 1px solid #eee; }
-        .stat-pill b { color: #28a745; font-size: 14px; display: block; }
-        .stat-pill span { font-size: 10px; color: #888; text-transform: uppercase; }
-
-        /* Main Balance Display */
+        /* Balance Card */
         .balance-card {
-            background: linear-gradient(135deg, #28a745, #1e7e34); color: white; 
-            padding: 30px; border-radius: 20px; text-align: center; 
-            box-shadow: 0 8px 20px rgba(40,167,69,0.3); margin-bottom: 25px;
+            background: linear-gradient(135deg, #28a745, #1e7e34); color: white;
+            padding: 30px; border-radius: 20px; text-align: center; margin-bottom: 20px;
         }
-        .balance-amount { font-size: 45px; font-weight: bold; margin: 5px 0; letter-spacing: -1px; }
+        .balance-amount { font-size: 40px; font-weight: bold; }
 
-        /* QR Withdrawal Box */
-        .qr-section {
-            display: none; background: #fff; padding: 20px; border-radius: 20px;
-            text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border: 2px solid #28a745;
+        /* Withdrawal Form */
+        .withdraw-form { background: #fff; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .input-group { margin-bottom: 15px; text-align: left; }
+        label { font-size: 13px; font-weight: bold; color: #555; }
+        input, select { 
+            width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ddd; 
+            border-radius: 8px; box-sizing: border-box; font-size: 15px;
         }
-        .qr-box { width: 210px; height: 210px; margin: 15px auto; padding: 10px; background: #fff; border-radius: 10px; box-shadow: inset 0 0 10px rgba(0,0,0,0.1); }
-        
-        .btn {
-            width: 100%; padding: 16px; border: none; border-radius: 12px;
-            font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s;
-        }
-        .withdraw-btn { background: #007bff; color: white; box-shadow: 0 4px 12px rgba(0,123,255,0.3); }
-        .whatsapp-btn { background: #25D366; color: white; margin-top: 15px; text-decoration: none; display: none; align-items: center; justify-content: center; gap: 10px; }
-        
-        /* Sticky Bottom Nav */
-        .footer-nav { position: fixed; bottom: 0; width: 100%; background: #fff; display: flex; justify-content: space-around; padding: 12px 0; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); z-index: 100; }
-        .footer-nav a { text-decoration: none; color: #888; font-size: 11px; text-align: center; font-weight: 500; }
-        .footer-nav a i { font-size: 20px; margin-bottom: 4px; display: block; }
-        .footer-nav a.active { color: #28a745; }
 
-        .payment-id { background: #eee; padding: 10px; border-radius: 8px; margin: 10px 0; font-size: 14px; font-weight: bold; color: #333; word-break: break-all; }
+        .submit-btn {
+            width: 100%; background: #25D366; color: white; border: none;
+            padding: 15px; border-radius: 10px; font-size: 16px; font-weight: bold;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
+        }
+        .submit-btn:hover { background: #128C7E; }
+
+        .footer-nav { 
+            position: fixed; bottom: 0; width: 100%; background: #fff; 
+            display: flex; justify-content: space-around; padding: 12px 0; 
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1); 
+        }
+        .footer-nav a { text-decoration: none; color: #888; font-size: 11px; text-align: center; }
+        .active { color: #28a745 !important; }
     </style>
 </head>
 <body>
 
     <header>
-        <span style="font-weight:bold; color:#28a745; font-size: 20px;">KRISHNA ADS</span>
-        <div style="font-size: 12px; color: #666;"><i class="fas fa-shield-alt"></i> Secure Center</div>
+        <h2 style="margin:0; color:#28a745;">Wallet</h2>
     </header>
 
-    <div class="earning-container">
-        <div class="user-card">
-            <h2 id="u-name">Loading...</h2>
-            <p id="u-phone">Mobile: --</p>
-            <p id="u-time" style="color:#28a745; font-weight:bold;">Watch Time: 0m</p>
-            
-            <div class="stats-row">
-                <div class="stat-pill"><b id="s-reels">0</b><span>Reels</span></div>
-                <div class="stat-pill"><b id="s-posts">0</b><span>Posts</span></div>
-                <div class="stat-pill"><b id="s-movies">0</b><span>Movies</span></div>
-            </div>
-        </div>
-
+    <div class="container">
         <div class="balance-card">
-            <span style="font-size: 14px; opacity: 0.9;">Payable Balance</span>
-            <div class="balance-amount">₹<span id="display-balance">0.00</span></div>
-            <p style="font-size: 11px; background: rgba(0,0,0,0.15); display: inline-block; padding: 3px 12px; border-radius: 50px;">Min. Withdraw: ₹1</p>
+            <span>Your Earning</span>
+            <div class="balance-amount">₹<span id="bal-val">0.00</span></div>
+            <p style="font-size:12px; opacity:0.8;">Min. Withdrawal: ₹1</p>
         </div>
 
-        <button class="btn withdraw-btn" onclick="generateRequestQR()">
-            <i class="fas fa-qrcode"></i> Generate Withdrawal QR
-        </button>
-
-        <div id="qr-area" class="qr-section">
-            <h4 style="margin:0; color:#333;">Request QR Generated</h4>
-            <div class="qr-box">
-                <img id="qr-img" src="" alt="Payment Request QR" style="width:100%; height:100%;">
-            </div>
-            <p style="font-size:12px; font-weight:bold; color:#555;">Admin UPI ID:</p>
-            <div class="payment-id">krushndevtalpada1@oksbi</div>
-            <p style="font-size:12px; color:#dc3545; font-weight:bold; margin-bottom:15px;">Take screenshot & send to Admin!</p>
+        <div class="withdraw-form">
+            <h3 style="margin-top:0; color:#333;">Withdraw Details</h3>
             
-            <a id="wa-link" href="#" class="btn whatsapp-btn">
-                <i class="fab fa-whatsapp" style="font-size:20px;"></i> Send Screenshot to Admin
-            </a>
+            <div class="input-group">
+                <label>Payment Method</label>
+                <select id="pay-method">
+                    <option value="Google Pay">Google Pay (GPay)</option>
+                    <option value="PhonePe">PhonePe</option>
+                    <option value="Paytm">Paytm</option>
+                    <option value="UPI ID">Direct UPI ID</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label>Phone Number / UPI ID</label>
+                <input type="text" id="pay-number" placeholder="e.g. 7862043514">
+            </div>
+
+            <button class="submit-btn" onclick="sendWithdrawRequest()">
+                <i class="fab fa-whatsapp"></i> Withdraw via WhatsApp
+            </button>
+            <p style="font-size:11px; color:#999; text-align:center; margin-top:10px;">
+                Request bhejte hi Admin aapko pay kar denge.
+            </p>
         </div>
     </div>
 
     <div class="footer-nav">
-        <a href="home.html"><i class="fas fa-home"></i>Home</a>
-        <a href="earning.html" class="active"><i class="fas fa-wallet"></i>Wallet</a>
-        <a href="contact.html"><i class="fas fa-headset"></i>Support</a>
-        <a href="profile.html"><i class="fas fa-user-circle"></i>Profile</a>
+        <a href="home.html"><i class="fas fa-home"></i><br>Home</a>
+        <a href="earning.html" class="active"><i class="fas fa-wallet"></i><br>Wallet</a>
+        <a href="profile.html"><i class="fas fa-user"></i><br>Profile</a>
     </div>
 
     <script>
@@ -115,56 +94,40 @@
             return b ? b.pop() : "0.00";
         }
 
-        // Load User Data
-        const rawProfile = getCookie("user_profile");
-        const userProfile = rawProfile ? JSON.parse(decodeURIComponent(rawProfile)) : {name: "User", mobile: "N/A"};
         const balance = getCookie("balance");
+        const user = JSON.parse(decodeURIComponent(getCookie("user_profile") || "{}"));
+        document.getElementById('bal-val').innerText = balance;
 
-        document.getElementById('u-name').innerText = userProfile.name;
-        document.getElementById('u-phone').innerText = "Mobile: " + userProfile.mobile;
-        document.getElementById('display-balance').innerText = balance;
+        function sendWithdrawRequest() {
+            let method = document.getElementById('pay-method').value;
+            let number = document.getElementById('pay-number').value.trim();
+            let amount = parseFloat(balance);
 
-        // Stats Logic
-        let r = JSON.parse(localStorage.getItem('seen_reel')) || [];
-        let p = JSON.parse(localStorage.getItem('seen_post')) || [];
-        let m = JSON.parse(localStorage.getItem('seen_movie')) || [];
-        document.getElementById('s-reels').innerText = r.length;
-        document.getElementById('s-posts').innerText = p.length;
-        document.getElementById('s-movies').innerText = m.length;
-
-        let totalSecs = (r.length * 30) + (p.length * 10) + (m.length * 120);
-        document.getElementById('u-time').innerText = "Watch Time: " + Math.floor(totalSecs/60) + "m " + (totalSecs%60) + "s";
-
-        // --- NEW WORKING QR LOGIC ---
-        function generateRequestQR() {
-            let balAmt = parseFloat(balance);
-            
-            if(balAmt < 1) {
-                alert("Withdrawal ke liye ₹1 hona zaroori hai.");
+            if(amount < 1) {
+                alert("Withdrawal ke liye kam se kam ₹1 hona chahiye.");
                 return;
             }
 
-            // Humne yahan 'Text Data' QR banaya hai jo har app scan kar sakegi
-            let adminUPI = "krushndevtalpada1@oksbi"; 
-            let qrData = `PAYMENT REQUEST\nName: ${userProfile.name}\nMobile: ${userProfile.mobile}\nAmount: Rs.${balAmt}\nUPI ID: ${adminUPI}`;
-            
-            let qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(qrData)}`;
-            
-            document.getElementById('qr-img').src = qrUrl;
-            document.getElementById('qr-area').style.display = 'block';
-            document.getElementById('wa-link').style.display = 'flex';
+            if(number.length < 5) {
+                alert("Kripya sahi number ya UPI ID dalein.");
+                return;
+            }
 
-            // WhatsApp Message
-            let waMsg = `*Withdrawal Request*%0A%0A` +
-                        `*User Name:* ${userProfile.name}%0A` +
-                        `*User Mobile:* ${userProfile.mobile}%0A` +
-                        `*Balance:* ₹${balAmt}%0A` +
-                        `*UPI to Pay:* ${adminUPI}%0A%0A` +
-                        `Kripya mera payment process karein. Maine screenshot le liya hai.`;
+            // WhatsApp Message Format
+            let msg = `*NEW WITHDRAWAL REQUEST*%0A` +
+                      `----------------------------%0A` +
+                      `*User Name:* ${user.name || 'Unknown'}%0A` +
+                      `*Earning Amount:* ₹${amount}%0A` +
+                      `*Payment App:* ${method}%0A` +
+                      `*Payment Number:* ${number}%0A` +
+                      `----------------------------%0A` +
+                      `Admin, kripya mera payment process karein.`;
 
-            document.getElementById('wa-link').href = `https://wa.me/917862043514?text=${waMsg}`;
+            // Admin Number: 7862043514
+            let waUrl = `https://wa.me/917862043514?text=${msg}`;
             
-            alert("Request QR generate ho gaya hai! Iska screenshot lekar WhatsApp karein.");
+            // Redirect to WhatsApp
+            window.location.href = waUrl;
         }
     </script>
 </body>
