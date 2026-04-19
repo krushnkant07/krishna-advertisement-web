@@ -7,37 +7,31 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { background: #f0f2f5; font-family: sans-serif; margin: 0; padding-bottom: 50px; }
+        body { background: #f0f2f5; font-family: sans-serif; margin: 0; padding-bottom: 70px; }
         header { background: #fff; padding: 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         
         .earning-container { max-width: 500px; margin: 20px auto; padding: 15px; }
         
-        /* User Info Card */
+        /* User Card */
         .user-info-card {
             background: #fff; padding: 20px; border-radius: 15px; margin-bottom: 20px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-left: 5px solid #28a745;
         }
         .user-info-card h2 { margin: 0; color: #333; font-size: 20px; }
-        .user-info-card p { margin: 5px 0; color: #666; font-size: 14px; }
 
-        /* Stats Grid */
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; }
-        .stat-box { background: #f8f9fa; padding: 10px; border-radius: 10px; text-align: center; border: 1px solid #eee; }
-        .stat-box b { color: #28a745; font-size: 16px; }
-
-        /* Balance Section */
+        /* Balance Card */
         .balance-card {
-            background: #28a745; color: white; padding: 25px; border-radius: 15px;
+            background: linear-gradient(135deg, #28a745, #218838); color: white; padding: 25px; border-radius: 15px;
             text-align: center; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(40,167,69,0.3);
         }
         .balance-amount { font-size: 40px; font-weight: bold; margin: 10px 0; }
 
-        /* Withdrawal Area */
+        /* QR Section */
         .qr-section {
             display: none; background: #fff; padding: 20px; border-radius: 15px;
             margin-top: 20px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
-        .qr-box { width: 200px; height: 200px; margin: 15px auto; border: 5px solid #f0f0f0; }
+        .qr-box { width: 200px; height: 200px; margin: 15px auto; border: 5px solid #f8f9fa; border-radius: 10px; overflow: hidden; }
         
         .btn {
             width: 100%; padding: 15px; border: none; border-radius: 10px;
@@ -59,34 +53,29 @@
 
     <div class="earning-container">
         <div class="user-info-card">
-            <h2 id="u-name">Loading...</h2>
-            <p id="u-phone">Mobile: --</p>
-            <p id="u-time" style="color:#28a745; font-weight:bold;">Watch Time: 0m 0s</p>
-            
-            <div class="stats-grid">
-                <div class="stat-box"><b id="s-reels">0</b><br><span>Reels</span></div>
-                <div class="stat-box"><b id="s-posts">0</b><br><span>Posts</span></div>
-                <div class="stat-box"><b id="s-movies">0</b><br><span>Movies</span></div>
-            </div>
+            <h2 id="u-name">User Name</h2>
+            <p id="u-phone" style="margin: 5px 0; color: #666;">Mobile: --</p>
+            <p id="u-time" style="color:#28a745; font-weight:bold; font-size: 13px;">Watch Time: --</p>
         </div>
 
         <div class="balance-card">
-            <span>Available Balance</span>
+            <span>Payable Balance</span>
             <div class="balance-amount">₹<span id="display-balance">0.00</span></div>
-            <p style="font-size:12px; opacity:0.8;">Minimum Withdrawal: ₹100</p>
+            <p style="font-size:12px; opacity:0.9;">Min. Withdrawal: ₹1</p>
         </div>
 
-        <button class="btn withdraw-btn" onclick="generateWithdraw()">Request Withdrawal</button>
+        <button class="btn withdraw-btn" onclick="generateUPI_QR()">Generate GPay QR</button>
 
         <div id="qr-area" class="qr-section">
-            <h4>Withdrawal Request QR</h4>
+            <h4 style="margin:0;">UPI Payment QR</h4>
+            <p style="font-size:11px; color:#666;">Scan with GPay/PhonePe to Pay Admin</p>
             <div class="qr-box">
-                <img id="qr-img" src="" alt="Withdrawal QR" style="width:100%;">
+                <img id="qr-img" src="" alt="UPI QR" style="width:100%; height:100%;">
             </div>
-            <p style="font-size:12px; color:#666;">Scan details above or use button below</p>
+            <p style="font-size:12px; color:red; font-weight:bold;">Screenshot le kar WhatsApp karein!</p>
             
             <a id="wa-link" href="#" class="btn whatsapp-btn">
-                <i class="fab fa-whatsapp"></i> Send Request to Admin
+                <i class="fab fa-whatsapp"></i> WhatsApp Screenshot to Admin
             </a>
         </div>
     </div>
@@ -98,7 +87,6 @@
     </div>
 
     <script>
-        // --- DATA LOADING ---
         function getCookie(n) {
             let b = document.cookie.match('(^|;)\\s*' + n + '\\s*=\\s*([^;]+)');
             return b ? b.pop() : "0.00";
@@ -107,56 +95,53 @@
         const userProfile = JSON.parse(decodeURIComponent(getCookie("user_profile") || "{}"));
         const balance = getCookie("balance");
 
-        // Load Header & Info
-        document.getElementById('u-name').innerText = userProfile.name || "User";
+        // Load UI
+        document.getElementById('u-name').innerText = userProfile.name || "Krushn Kant";
         document.getElementById('u-phone').innerText = "Mobile: " + (userProfile.mobile || "N/A");
         document.getElementById('display-balance').innerText = balance;
 
-        // Stats Calculation
-        let r = JSON.parse(localStorage.getItem('seen_reel')) || [];
-        let p = JSON.parse(localStorage.getItem('seen_post')) || [];
-        let m = JSON.parse(localStorage.getItem('seen_movie')) || [];
-
-        document.getElementById('s-reels').innerText = r.length;
-        document.getElementById('s-posts').innerText = p.length;
-        document.getElementById('s-movies').innerText = m.length;
-
-        // Watch Time Calculation
-        let totalSecs = (r.length * 30) + (p.length * 10) + (m.length * 120);
-        let mins = Math.floor(totalSecs / 60);
-        let secs = totalSecs % 60;
-        document.getElementById('u-time').innerText = "Total Watch Time: " + mins + "m " + secs + "s";
-
-        // --- WITHDRAWAL LOGIC ---
-        function generateWithdraw() {
+        function generateUPI_QR() {
             let balAmt = parseFloat(balance);
-            
             if(balAmt < 1) {
-                alert("Minimum ₹1 chahiye withdraw ke liye. Aapka balance: ₹" + balAmt);
+                alert("Withdrawal ke liye kam se kam ₹1 hona chahiye.");
                 return;
             }
 
-            // QR Data String
-            let qrData = `USER:${userProfile.name}|MOB:${userProfile.mobile}|BAL:₹${balAmt}|TIME:${mins}m`;
-            let qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(qrData)}`;
+            // --- UPI CONFIGURATION ---
+            let adminUPI = "7862043514@okbizaxis"; // Aapka GPay UPI ID yahan dalein
+            let adminName = "Krushn Kant";
+            let note = encodeURIComponent("Ads Earning Withdrawal - " + userProfile.name);
+
+            // Standard UPI Deep Link: upi://pay?pa=ID&pn=NAME&am=AMOUNT&cu=INR&tn=NOTE
+            let upiLink = `upi://pay?pa=${adminUPI}&pn=${encodeURIComponent(adminName)}&am=${balAmt}&cu=INR&tn=${note}`;
+            
+            // QR API Call
+            let qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiLink)}`;
             
             document.getElementById('qr-img').src = qrUrl;
             document.getElementById('qr-area').style.display = 'block';
             document.getElementById('wa-link').style.display = 'block';
 
-            // WhatsApp Message Logic
-            let waMessage = `*New Withdrawal Request*%0A%0A` +
-                            `*Name:* ${userProfile.name}%0A` +
-                            `*Phone:* ${userProfile.mobile}%0A` +
-                            `*Balance:* ₹${balAmt}%0A` +
-                            `*Watch Time:* ${mins}m ${secs}s%0A` +
-                            `*Total Ads:* ${r.length + p.length + m.length}%0A%0A` +
-                            `Please process my payment.`;
+            // WhatsApp Logic
+            let waMessage = `*UPI Withdrawal Request*%0A` +
+                            `--------------------------%0A` +
+                            `*From:* ${userProfile.name}%0A` +
+                            `*User Phone:* ${userProfile.mobile}%0A` +
+                            `*Requested Amount:* ₹${balAmt}%0A` +
+                            `--------------------------%0A` +
+                            `Maine QR generate kar liya hai, kripya payment karein.`;
 
             document.getElementById('wa-link').href = `https://wa.me/917862043514?text=${waMessage}`;
             
-            alert("QR Code and WhatsApp link generated!");
+            alert("GPay compatible QR taiyar hai!");
         }
+
+        // Stats loading logic (same as before)
+        let r = JSON.parse(localStorage.getItem('seen_reel')) || [];
+        let p = JSON.parse(localStorage.getItem('seen_post')) || [];
+        let m = JSON.parse(localStorage.getItem('seen_movie')) || [];
+        let totalSecs = (r.length * 30) + (p.length * 10) + (m.length * 120);
+        document.getElementById('u-time').innerText = "Total Watch Time: " + Math.floor(totalSecs/60) + "m";
     </script>
 </body>
 </html>
