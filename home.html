@@ -1,116 +1,151 @@
-<!DOCTYPE html>
-<html lang="en">
+            <!DOCTYPE html>
+<html lang="hi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home - Krishna Ads</title>
+    <title>Dashboard - Krishna Ads</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
+        /* Ad Player Overlay Styling */
         #ad-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,1); z-index: 1000; flex-direction: column;
-            align-items: center; justify-content: center; color: white;
+            background: rgba(0,0,0,0.98); z-index: 1000; flex-direction: column;
+            align-items: center; justify-content: center; color: white; text-align: center;
         }
-        .timer-display { font-size: 28px; color: #00ff00; margin-bottom: 15px; font-weight: bold; }
-        video, img { max-width: 95%; max-height: 80%; border: 2px solid white; border-radius: 10px; }
-        .no-ads-msg { color: #ccc; font-style: italic; font-size: 14px; }
+        .timer-display { font-size: 30px; color: #00ff00; margin-bottom: 20px; font-weight: bold; }
+        #ad-content video, #ad-content img { 
+            max-width: 90%; max-height: 70vh; border: 3px solid #fff; border-radius: 12px; 
+            box-shadow: 0 0 20px rgba(255,255,255,0.2);
+        }
+        .no-ads-msg { display: block; margin-top: 10px; color: #ff4444; font-size: 13px; font-weight: bold; }
+        
+        /* Dashboard Container */
+        .container { display: flex; flex-wrap: wrap; justify-content: center; padding: 20px; gap: 20px; }
+        .ad-box { 
+            background: white; border-radius: 15px; padding: 25px; width: 280px; 
+            cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.1); transition: 0.3s;
+            border-top: 5px solid #28a745;
+        }
+        .ad-box:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.2); }
     </style>
 </head>
 <body>
     <header>
-        <h1>Krishna Ads</h1>
-        <nav><a href="home.html">Home</a> | <a href="earning.html">Earning</a></nav>
+        <h1>Krishna Advertisement</h1>
+        <nav>
+            <a href="home.html">Home</a> | 
+            <a href="earning.html">Earning</a> |
+            <a href="index.html" onclick="logout()">Logout</a>
+        </nav>
     </header>
 
     <div class="container">
-        <div class="ad-box" id="reel-btn" onclick="playRandomAd('reel')">
-            <h3>Watch Random Reel</h3>
-            <p>Earn ₹0.10 | 30s</p>
-            <span class="no-ads-msg" id="reel-status"></span>
+        <div class="ad-box" onclick="playRandomAd('reel')">
+            <h3>Watch Reels</h3>
+            <p>Earn ₹0.10 | 30 Seconds</p>
+            <span id="reel-status" class="no-ads-msg"></span>
         </div>
 
-        <div class="ad-box" id="post-btn" onclick="playRandomAd('post')">
-            <h3>View Random Post</h3>
-            <p>Earn ₹0.06 | 10s</p>
-            <span class="no-ads-msg" id="post-status"></span>
+        <div class="ad-box" onclick="playRandomAd('post')">
+            <h3>View Posts</h3>
+            <p>Earn ₹0.06 | 10 Seconds</p>
+            <span id="post-status" class="no-ads-msg"></span>
         </div>
 
-        <div class="ad-box" id="movie-btn" onclick="playRandomAd('movie')">
-            <h3>Short Movie Ad</h3>
-            <p>Earn ₹0.50 | 2m</p>
-            <span class="no-ads-msg" id="movie-status"></span>
+        <div class="ad-box" onclick="playRandomAd('movie')">
+            <h3>Short Movie Ads</h3>
+            <p>Earn ₹0.50 | 2 Minutes</p>
+            <span id="movie-status" class="no-ads-msg"></span>
         </div>
     </div>
 
     <div id="ad-overlay">
-        <div class="timer-display">Time Left: <span id="countdown">0</span>s</div>
+        <div class="timer-display">Ad Ends In: <span id="countdown">0</span>s</div>
         <div id="ad-content"></div>
+        <p style="margin-top: 20px; color: #aaa;">Don't close! Payment will add automatically.</p>
     </div>
 
     <script>
-        // Database of your files (Aap yahan jitni chahe files add karein)
+        // --- ADMIN: APNI FILES KE NAAM YAHAN DAALEIN ---
         const adDatabase = {
-            reel: ["video1.mp4", "video2.mp4", "video3.mp4", "video4.mp4"],
-            post: ["image1.png", "image2.png", "image3.png", "image4.png"],
-            movie: ["short1.mp4", "short2.mp4"]
+            reel: ["my_funny_video.mp4", "dance_reel.mp4", "nature_clip.mp4"], 
+            post: ["offer_banner.jpg", "product_image.png", "sale_notice.webp"], 
+            movie: ["action_short.mp4", "drama_scene.mp4"]
         };
 
         function playRandomAd(type) {
+            // Check seen ads from localStorage
             let seenAds = JSON.parse(localStorage.getItem(`seen_${type}`)) || [];
-            let availableAds = adDatabase[type].filter(ad => !seenAds.includes(ad));
+            let availableAds = adDatabase[type].filter(file => !seenAds.includes(file));
 
             if (availableAds.length === 0) {
-                alert(`Aapne aaj ki saari ${type}s dekh li hain!`);
-                document.getElementById(`${type}-status`).innerText = "No more ads available";
+                alert(`Mubarak ho! Aapne saari ${type}s dekh li hain.`);
+                document.getElementById(`${type}-status`).innerText = "No more ads for today!";
                 return;
             }
 
-            // Random selection
-            let randomAd = availableAds[Math.floor(Math.random() * availableAds.length)];
-            let duration = type === 'reel' ? 30 : (type === 'post' ? 10 : 120);
-            let path = `upload-add/${type === 'reel' ? 'reels' : type === 'post' ? 'post' : 'short-movie'}/${randomAd}`;
+            // Select random file
+            let selectedFile = availableAds[Math.floor(Math.random() * availableAds.length)];
+            
+            // Set paths and timers
+            let folder = (type === 'reel') ? 'reels' : (type === 'post' ? 'post' : 'short-movie');
+            let duration = (type === 'reel') ? 30 : (type === 'post' ? 10 : 120);
+            let filePath = `upload-add/${folder}/${selectedFile}`;
 
-            startAdPlayer(type, path, duration, randomAd);
+            showAdPlayer(type, filePath, duration, selectedFile);
         }
 
-        function startAdPlayer(type, src, duration, adFileName) {
+        function showAdPlayer(type, src, time, fileName) {
             const overlay = document.getElementById('ad-overlay');
             const content = document.getElementById('ad-content');
             const timerText = document.getElementById('countdown');
-            
+
             overlay.style.display = 'flex';
-            let timeLeft = duration;
-            timerText.innerText = timeLeft;
+            timerText.innerText = time;
 
-            content.innerHTML = (type === 'post') ? 
-                `<img src="${src}">` : 
-                `<video id="v" src="${src}" autoplay muted playsinline oncontextmenu="return false;"></video>`;
+            // Load Content
+            if (type === 'post') {
+                content.innerHTML = `<img src="${src}" onerror="handleError()">`;
+            } else {
+                content.innerHTML = `<video id="activeVid" src="${src}" autoplay muted playsinline oncontextmenu="return false;"></video>`;
+            }
 
-            const interval = setInterval(() => {
+            // Start Unskippable Timer
+            let timeLeft = time;
+            const timerInterval = setInterval(() => {
                 timeLeft--;
                 timerText.innerText = timeLeft;
+
                 if (timeLeft <= 0) {
-                    clearInterval(interval);
-                    finishAd(type, adFileName);
+                    clearInterval(timerInterval);
+                    completeTask(type, fileName);
                 }
             }, 1000);
         }
 
-        function finishAd(type, adFileName) {
-            // 1. Mark as Seen (Hide logic)
+        function completeTask(type, fileName) {
+            // 1. Mark as seen
             let seenAds = JSON.parse(localStorage.getItem(`seen_${type}`)) || [];
-            seenAds.push(adFileName);
+            seenAds.push(fileName);
             localStorage.setItem(`seen_${type}`, JSON.stringify(seenAds));
 
-            // 2. Add Money
-            let reward = type === 'reel' ? 0.10 : (type === 'post' ? 0.06 : 0.50);
-            let bal = parseFloat(getCookie("balance")) || 0;
-            setCookie("balance", (bal + reward).toFixed(2));
+            // 2. Add Money in Cookie (1 Year)
+            let reward = (type === 'reel') ? 0.10 : (type === 'post') ? 0.06 : 0.50;
+            let currentBal = parseFloat(getCookie("balance")) || 0;
+            let newBal = (currentBal + reward).toFixed(2);
+            
+            setCookie("balance", newBal);
 
-            alert(`Task Finished! ₹${reward} added.`);
+            alert("Kamaal kar diya! ₹" + reward + " aapke wallet mein jud gaye.");
             window.location.href = "earning.html";
         }
 
+        function handleError() {
+            alert("File nahi mili! Check your upload-add folder.");
+            location.reload();
+        }
+
+        // --- COOKIE HELPERS ---
         function setCookie(n, v) {
             const d = new Date(); d.setTime(d.getTime() + (365*24*60*60*1000));
             document.cookie = `${n}=${v};expires=${d.toUTCString()};path=/`;
@@ -120,6 +155,10 @@
             let b = document.cookie.match('(^|;)\\s*' + n + '\\s*=\\s*([^;]+)');
             return b ? b.pop() : "0.00";
         }
+
+        function logout() {
+            alert("Logging out...");
+        }
     </script>
 </body>
-                                   </html>
+    </html>
