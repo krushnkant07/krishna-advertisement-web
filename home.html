@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Krishna Ads - Final Premium Dashboard</title>
+    <title>Krishna Ads - Sound & Full Screen</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
@@ -21,7 +21,7 @@
             font-family: 'Segoe UI', Roboto, sans-serif; 
         }
         
-        /* --- FIXED HEADER --- */
+        /* --- HEADER --- */
         header { 
             background: var(--white); 
             padding: 0 20px; 
@@ -36,14 +36,7 @@
         }
 
         .logo { color: var(--primary-green); font-size: 22px; font-weight: bold; text-decoration: none; }
-        
-        .header-links { display: flex; gap: 15px; }
-        .header-links a { text-decoration: none; color: #444; font-size: 14px; font-weight: 600; }
-        .header-links a:hover { color: var(--primary-green); }
-
         .wallet-display { background: #e8f5e9; padding: 5px 12px; border-radius: 20px; color: var(--primary-green); font-weight: bold; border: 1px solid #c8e6c9; font-size: 14px; }
-
-        @media (max-width: 650px) { .header-links { display: none; } }
 
         /* --- TICKER --- */
         #ticker-container {
@@ -54,20 +47,10 @@
         #ticker-text { display: inline-block; animation: scrollText 30s linear infinite; }
         @keyframes scrollText { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
 
-        /* --- STATS BAR --- */
-        .stats-bar { 
-            background: var(--white); margin: 15px 10px; padding: 15px; border-radius: 12px; 
-            display: flex; justify-content: space-around; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-        .stat-item { text-align: center; }
-        .stat-item b { font-size: 18px; color: #333; display: block; }
-        .stat-item span { font-size: 11px; color: #777; text-transform: uppercase; letter-spacing: 0.5px; }
-
         /* --- GRID CONTAINER --- */
-        .container { max-width: 900px; margin: auto; padding: 10px; display: grid; grid-template-columns: 1fr; gap: 15px; }
+        .container { max-width: 900px; margin: auto; padding: 20px; display: grid; grid-template-columns: 1fr; gap: 15px; }
         @media(min-width: 600px) { .container { grid-template-columns: 1fr 1fr 1fr; } }
 
-        /* --- AD CARDS --- */
         .ad-box {
             background: var(--white); border-radius: 15px; padding: 25px; text-align: center;
             box-shadow: 0 4px 12px rgba(0,0,0,0.08); cursor: pointer; transition: transform 0.2s;
@@ -75,31 +58,37 @@
         }
         .ad-box:active { transform: scale(0.96); }
         .ad-box i { font-size: 40px; color: var(--primary-green); margin-bottom: 12px; }
-        .ad-box h3 { margin: 5px 0; font-size: 18px; color: #333; }
-        .ad-box p { color: var(--primary-green); font-weight: bold; margin: 10px 0 0 0; font-size: 15px; }
 
-        /* --- FOOTER NAV --- */
-        footer { 
-            background: var(--white); position: fixed; bottom: 0; width: 100%; 
-            display: flex; justify-content: space-around; padding: 12px 0; 
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.1); z-index: 1000;
-        }
-        .footer-item { text-align: center; color: #666; text-decoration: none; font-size: 11px; font-weight: 500; }
-        .footer-item i { font-size: 20px; display: block; margin-bottom: 4px; }
-        .footer-item:active, .footer-item.active { color: var(--primary-green); }
-
-        /* --- OVERLAY PLAYER --- */
+        /* --- OVERLAY PLAYER (FULL SCREEN NO-CUT) --- */
         #ad-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #000; z-index: 9999; flex-direction: column; align-items: center; justify-content: center;
         }
-        .timer-display { 
-            position: absolute; top: 30px; font-size: 24px; color: #fff;
-            background: rgba(40, 167, 69, 0.9); padding: 10px 30px; border-radius: 50px;
-            font-weight: bold; z-index: 10000; border: 2px solid #fff;
+        
+        #media-wrap {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #000;
         }
-        .media-fit { max-width: 100%; max-height: 90vh; object-fit: contain; }
-        .spinner { border: 4px solid rgba(255,255,255,0.3); border-top: 4px solid var(--primary-green); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 10px; }
+
+        /* Image and Video scaling to ensure NO CUTTING */
+        .media-fit { 
+            max-width: 100%; 
+            max-height: 100%; 
+            object-fit: contain; /* Isse photo/video kategi nahi */
+            border: none;
+        }
+
+        .timer-display { 
+            position: absolute; top: 30px; font-size: 22px; color: #fff;
+            background: rgba(0, 0, 0, 0.6); padding: 8px 25px; border-radius: 50px;
+            font-weight: bold; z-index: 10001; border: 1px solid var(--primary-green);
+        }
+
+        .spinner { border: 4px solid rgba(255,255,255,0.3); border-top: 4px solid var(--primary-green); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
@@ -107,29 +96,17 @@
 
     <header>
         <a href="home.html" class="logo">Krishna Ads</a>
-        <nav class="header-links">
-            <a href="home.html">Home</a>
-            <a href="about.html">About</a>
-            <a href="contact.html">Contact</a>
-            <a href="earning.html">Withdraw</a>
-        </nav>
         <div class="wallet-display"><i class="fas fa-wallet"></i> ₹<span id="nav-bal">0.00</span></div>
     </header>
 
     <div id="ticker-container">
-        <div id="ticker-text">Welcome Krushn Kant! • Daily tasks are reset • Check Profile to send feedback • WhatsApp Support: +91 7862043514 • Payments are processed every Sunday!</div>
-    </div>
-
-    <div class="stats-bar">
-        <div class="stat-item"><b id="stat-reels">0</b><span>Reels</span></div>
-        <div class="stat-item"><b id="stat-posts">0</b><span>Posts</span></div>
-        <div class="stat-item"><b id="stat-movies">0</b><span>Movies</span></div>
+        <div id="ticker-text">Welcome Krushn Kant! • Sound enabled on Reels • Watch full video to earn • Sunday Payouts!</div>
     </div>
 
     <div class="container">
         <div class="ad-box" onclick="startTask('reel')">
             <i class="fas fa-play-circle"></i>
-            <h3>Reels Task</h3>
+            <h3>Watch Reels</h3>
             <p>+ ₹0.10</p>
         </div>
         <div class="ad-box" onclick="startTask('post')">
@@ -144,22 +121,14 @@
         </div>
     </div>
 
-    <footer>
-        <a href="home.html" class="footer-item active"><i class="fas fa-home"></i>Home</a>
-        <a href="about.html" class="footer-item"><i class="fas fa-info-circle"></i>About</a>
-        <a href="contact.html" class="footer-item"><i class="fas fa-envelope"></i>Contact</a>
-        <a href="profile.html" class="footer-item"><i class="fas fa-user-circle"></i>Profile</a>
-    </footer>
-
     <div id="ad-overlay">
-        <div id="load-info" style="text-align:center; color:white;">
-            <div class="spinner"></div>
-            Loading Advertisement...
+        <div id="load-info" style="text-align:center; color:white; position:absolute;">
+            <div class="spinner"></div><br>Loading with Sound...
         </div>
         <div id="time-box" class="timer-display" style="display:none;">
-            <i class="fas fa-clock"></i> <span id="countdown">0</span>s
+            <span id="countdown">0</span>s
         </div>
-        <div id="media-wrap" style="width:100%; height:100%; display:flex; justify-content:center; align-items:center;"></div>
+        <div id="media-wrap"></div>
     </div>
 
     <script>
@@ -173,23 +142,7 @@
 
         window.onload = () => {
             document.getElementById('nav-bal').innerText = getCookie("balance");
-            updateStats();
-            loadFeedbacks();
         };
-
-        function updateStats() {
-            document.getElementById('stat-reels').innerText = (JSON.parse(localStorage.getItem('seen_reel')) || []).length;
-            document.getElementById('stat-posts').innerText = (JSON.parse(localStorage.getItem('seen_post')) || []).length;
-            document.getElementById('stat-movies').innerText = (JSON.parse(localStorage.getItem('seen_movie')) || []).length;
-        }
-
-        function loadFeedbacks() {
-            let feeds = JSON.parse(localStorage.getItem('admin_feeds')) || [];
-            if(feeds.length > 0) {
-                let text = feeds.map(f => `★ ${f.user}: ${f.text}`).join("    |    ");
-                document.getElementById('ticker-text').innerText = text;
-            }
-        }
 
         async function startTask(type) {
             document.getElementById('ad-overlay').style.display = 'flex';
@@ -204,7 +157,7 @@
                 if(type === 'post') {
                     let seen = JSON.parse(localStorage.getItem('seen_post')) || [];
                     let available = postDatabase.filter(i => !seen.includes(i));
-                    if(available.length === 0) { hideAd(); return alert("Tasks finished for today!"); }
+                    if(available.length === 0) { hideAd(); return alert("All posts done!"); }
                     selectedId = available[Math.floor(Math.random()*available.length)];
                     duration = 10;
                     renderMedia(`<img src="upload-add/post/${selectedId}" class="media-fit" onload="runTimer(${duration},'${type}','${selectedId}')">`);
@@ -217,9 +170,11 @@
                     if(available.length === 0) { hideAd(); return alert(`All ${type}s viewed!`); }
                     selectedId = available[Math.floor(Math.random()*available.length)];
                     duration = type === 'reel' ? 30 : 120;
-                    renderMedia(`<iframe src="https://www.youtube.com/embed/${selectedId}?autoplay=1&mute=1&controls=0&rel=0" class="media-fit" style="width:100vw; height:56.25vw; border:none;" onload="runTimer(${duration},'${type}','${selectedId}')" allow="autoplay"></iframe>`);
+                    
+                    // Mute=0 and Controls=1 for Sound Support
+                    renderMedia(`<iframe src="https://www.youtube.com/embed/${selectedId}?autoplay=1&mute=0&controls=1&modestbranding=1" class="media-fit" style="width:100%; height:100%;" onload="runTimer(${duration},'${type}','${selectedId}')" allow="autoplay"></iframe>`);
                 }
-            } catch(e) { hideAd(); alert("Error connecting to server. Check .txt files."); }
+            } catch(e) { hideAd(); alert("Error loading ad."); }
         }
 
         function renderMedia(html) { document.getElementById('media-wrap').innerHTML = html; }
@@ -242,8 +197,9 @@
             seen.push(id);
             localStorage.setItem(`seen_${type}`, JSON.stringify(seen));
             let r = type === 'reel' ? 0.10 : (type === 'post' ? 0.06 : 0.50);
-            setCookie("balance", (parseFloat(getCookie("balance")) + r).toFixed(2));
-            alert("Reward: ₹" + r + " added.");
+            let current = parseFloat(getCookie("balance")) || 0;
+            setCookie("balance", (current + r).toFixed(2));
+            alert("Success! Reward Added.");
             window.location.reload();
         }
 
