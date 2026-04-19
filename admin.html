@@ -3,97 +3,130 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Portal - Krishna Ads</title>
+    <title>Admin Dashboard - Krishna Ads</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { background: #f0f2f5; font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-        .auth-card { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 350px; text-align: center; }
-        h2 { color: #28a745; margin-bottom: 20px; }
-        .input-group { margin-bottom: 15px; text-align: left; }
-        label { font-size: 12px; font-weight: bold; color: #666; }
-        input { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        .btn { width: 100%; background: #28a745; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        .toggle-link { margin-top: 15px; font-size: 13px; color: #007bff; cursor: pointer; display: block; }
+        :root { --primary: #28a745; --bg: #f4f7f6; }
+        body { background: var(--bg); font-family: sans-serif; margin: 0; }
+        header { background: #333; color: white; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; position: sticky; top:0; z-index:100; }
+        
+        .notification-bell { position: relative; cursor: pointer; font-size: 20px; }
+        .badge { position: absolute; top: -5px; right: -8px; background: red; color: white; font-size: 10px; padding: 2px 6px; border-radius: 50%; }
+
+        .container { max-width: 1000px; margin: 30px auto; padding: 0 15px; }
+        .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 30px; }
+        .stat-card { background: white; padding: 20px; border-radius: 12px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+
+        .table-container { background: white; border-radius: 15px; overflow-x: auto; box-shadow: 0 5px 20px rgba(0,0,0,0.05); }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f8f9fa; color: #666; font-size: 13px; }
+        
+        .status-btn { padding: 8px 15px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .btn-pay { background: #007bff; color: white; }
+        .paid-tag { color: #28a745; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <div class="auth-card" id="login-box">
-        <h2>Admin Login</h2>
-        <div class="input-group">
-            <label>Admin Email</label>
-            <input type="email" id="l-email" placeholder="admin@example.com">
+    <header>
+        <h3><i class="fas fa-user-shield"></i> KRISHNA ADMIN</h3>
+        <div class="notification-bell" onclick="scrollToTable()">
+            <i class="fas fa-bell"></i>
+            <span class="badge" id="notif-count">0</span>
         </div>
-        <div class="input-group">
-            <label>Password</label>
-            <input type="password" id="l-pass" placeholder="••••••••">
-        </div>
-        <button class="btn" onclick="loginAdmin()">Login to Dashboard</button>
-        <span class="toggle-link" onclick="toggleAuth()">Create Admin Account (One Time)</span>
-    </div>
+    </header>
 
-    <div class="auth-card" id="signup-box" style="display:none;">
-        <h2>Admin Signup</h2>
-        <div class="input-group">
-            <label>Set Admin Email</label>
-            <input type="email" id="s-email" placeholder="admin@krishna.com">
+    <div class="container">
+        <div class="stats-row">
+            <div class="stat-card">
+                <i class="fas fa-wallet" style="color:#28a745;"></i>
+                <h4>Pending</h4>
+                <p id="total-pending">₹0.00</p>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-check-circle" style="color:#007bff;"></i>
+                <h4>Paid Today</h4>
+                <p id="total-paid">₹0.00</p>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-users" style="color:#333;"></i>
+                <h4>Total User</h4>
+                <p>1 (Active)</p>
+            </div>
         </div>
-        <div class="input-group">
-            <label>Set Secure Password</label>
-            <input type="password" id="s-pass" placeholder="Create Password">
+
+        <div class="table-container">
+            <div style="padding:15px; font-weight:bold; border-bottom:1px solid #eee;">Withdrawal Notifications</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>User & Time</th>
+                        <th>Amount</th>
+                        <th>Payment Details</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="admin-table-body">
+                    </tbody>
+            </table>
         </div>
-        <button class="btn" style="background: #333;" onclick="signupAdmin()">Register Admin</button>
-        <span class="toggle-link" onclick="toggleAuth()">Back to Login</span>
     </div>
 
     <script>
-        // --- TOGGLE BETWEEN LOGIN & SIGNUP ---
-        function toggleAuth() {
-            const lBox = document.getElementById('login-box');
-            const sBox = document.getElementById('signup-box');
-            if(lBox.style.display === "none") {
-                lBox.style.display = "block";
-                sBox.style.display = "none";
-            } else {
-                lBox.style.display = "none";
-                sBox.style.display = "block";
+        // Security Check
+        if(sessionStorage.getItem('isAdminLoggedIn') !== 'true') window.location.href = 'admin_login.html';
+
+        function loadDashboard() {
+            const requests = JSON.parse(localStorage.getItem('admin_notifications')) || [];
+            const tableBody = document.getElementById('admin-table-body');
+            let pendingAmt = 0;
+            let paidAmt = 0;
+            let pendingCount = 0;
+
+            tableBody.innerHTML = "";
+
+            requests.reverse().forEach((req, index) => {
+                const isPaid = req.status === "Paid";
+                if(!isPaid) {
+                    pendingAmt += parseFloat(req.amount);
+                    pendingCount++;
+                } else {
+                    paidAmt += parseFloat(req.amount);
+                }
+
+                let tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><b>${req.user}</b><br><small>${req.time}</small></td>
+                    <td style="color:${isPaid ? '#28a745' : 'red'}; font-weight:bold;">₹${req.amount}</td>
+                    <td><b>${req.method}</b><br>${req.mobile}</td>
+                    <td>
+                        ${isPaid ? '<span class="paid-tag">✓ Success</span>' : 
+                        `<button class="status-btn btn-pay" onclick="markAsPaid(${requests.length - 1 - index}, ${req.amount})">Pay Now</button>`}
+                    </td>
+                `;
+                tableBody.appendChild(tr);
+            });
+
+            document.getElementById('total-pending').innerText = "₹" + pendingAmt.toFixed(2);
+            document.getElementById('total-paid').innerText = "₹" + paidAmt.toFixed(2);
+            document.getElementById('notif-count').innerText = pendingCount;
+        }
+
+        function markAsPaid(originalIndex, amt) {
+            if(confirm(`Kya aapne ₹${amt} bhej diye hain?`)) {
+                let requests = JSON.parse(localStorage.getItem('admin_notifications'));
+                requests[originalIndex].status = "Paid";
+                localStorage.setItem('admin_notifications', JSON.stringify(requests));
+                loadDashboard();
             }
         }
 
-        // --- SIGNUP LOGIC (One Time Use) ---
-        function signupAdmin() {
-            const email = document.getElementById('s-email').value;
-            const pass = document.getElementById('s-pass').value;
+        function scrollToTable() { window.scrollTo({ top: 500, behavior: 'smooth' }); }
 
-            if(!email || !pass) return alert("Fields cannot be empty!");
-
-            const adminData = { email: email, pass: pass };
-            localStorage.setItem('krishna_admin_credentials', JSON.stringify(adminData));
-            
-            alert("Admin Registered! Now delete the signup code and Login.");
-            toggleAuth();
-        }
-
-        // --- LOGIN LOGIC ---
-        function loginAdmin() {
-            const email = document.getElementById('l-email').value;
-            const pass = document.getElementById('l-pass').value;
-
-            const storedData = JSON.parse(localStorage.getItem('krishna_admin_credentials'));
-
-            if(!storedData) {
-                alert("No Admin found! Please use signup first.");
-                return;
-            }
-
-            if(email === storedData.email && pass === storedData.pass) {
-                alert("Login Successful! Redirecting...");
-                sessionStorage.setItem('isAdminLoggedIn', 'true');
-                window.location.href = 'admin.html'; // Aapka Admin Dashboard Page
-            } else {
-                alert("Invalid Email or Password!");
-            }
-        }
+        window.onload = loadDashboard;
+        // Auto Refresh every 30 seconds
+        setInterval(loadDashboard, 30000);
     </script>
 </body>
 </html>
